@@ -18,7 +18,7 @@ public final class Utils {
     public static Set<FilterCanPair> filterCanPairs;
 
     //карта всех возможных фильтров (со списком значений удовлетворяющих этот фильтр) для диапазона 0x00-0xFF
-    public static Map<FilterCanPair, List<Integer>> maps;
+    public static Map<FilterCanPair, Set<Integer>> maps;
 
 
     static {
@@ -93,7 +93,7 @@ public final class Utils {
                         (filterCanPair) -> IntStream.rangeClosed(0x00, 0xFF)
                                 .filter(canId -> INT_TERNARY_OPERATOR.test(canId, filterCanPair.getFilterMaskId(), filterCanPair.getFilterId()))
                                 .boxed()
-                                .toList()
+                                .collect(Collectors.toSet())
                 ));
 
     }
@@ -158,7 +158,7 @@ public final class Utils {
     //сортировка и вывод количества элементов для карты фильтров
     public static void soutQuantitySizeMaps() {
         Map<Integer, Integer> map = new TreeMap<>();
-        for (Map.Entry<FilterCanPair, List<Integer>> filterCanPairListEntry : maps.entrySet()) {
+        for (Map.Entry<FilterCanPair, Set<Integer>> filterCanPairListEntry : maps.entrySet()) {
             int size = filterCanPairListEntry.getValue().size();
             if (map.containsKey(size)) {
                 map.compute(size, (k, old_quantity) -> old_quantity + 1);

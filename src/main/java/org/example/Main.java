@@ -1,6 +1,10 @@
 package org.example;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.example.Utils.maps;
 
 public class Main {
 
@@ -47,6 +51,22 @@ public class Main {
     }
 
     public static void findAllFiltersForCanId2(int[] can_arr) {
+        List<List<Integer>> result = allCombinationList(can_arr);
+
+        Map<Set<FilterCanPair>, List<CombinationCanIdAndFilters>> a = result.stream()
+                .map(CombinationCanIdAndFilters::new)
+                .filter(i -> i.getSize() > 1)
+                .collect(Collectors.groupingBy( b -> new HashSet<>(b.getMapsFilters().keySet())));
+
+        a.entrySet().forEach(entry -> {
+            System.out.println(entry.getKey());
+            System.out.println(entry.getValue());
+        });
+
+        System.out.println(result);
+    }
+
+    public static List<List<Integer>> allCombinationList(int[] can_arr) {
         List<List<Integer>> result = new ArrayList<>();
         int n = can_arr.length;
         int totalSubsets = 1 << n; // 2^n
@@ -60,9 +80,48 @@ public class Main {
             }
             result.add(subset);
         }
+        return result;
+    }
 
 
-        System.out.println(result);
+}
+
+class CombinationCanIdAndFilters {
+    private final List<Integer> canIds;
+    private final Map<FilterCanPair, Set<Integer>> mapsFilters;
+
+    public CombinationCanIdAndFilters(List<Integer> canIds) {
+        this.canIds = canIds;
+
+        mapsFilters = maps.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().containsAll(canIds))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public int getSize() {
+        return mapsFilters.size();
+    }
+
+    public List<Integer> getCanIds() {
+        return canIds;
+    }
+
+    public Map<FilterCanPair, Set<Integer>> getMapsFilters() {
+        return mapsFilters;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CombinationCanIdAndFilters that = (CombinationCanIdAndFilters) o;
+        return Objects.equals(canIds, that.canIds) && Objects.equals(mapsFilters, that.mapsFilters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(canIds, mapsFilters);
     }
 }
 

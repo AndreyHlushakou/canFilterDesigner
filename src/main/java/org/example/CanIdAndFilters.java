@@ -2,6 +2,7 @@ package org.example;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.example.Utils.maps;
@@ -10,7 +11,7 @@ import static org.example.Utils.intToHex;
 //класс для хранения карты фильтров (со списком значений удовлетворяющих этот фильтр) для определенного canId
 class CanIdAndFilters {
     private final int canId;
-    private final Map<FilterCanPair, List<Integer>> mapArr;
+    private final Map<FilterCanPair, Set<Integer>> mapArr;
 
     public CanIdAndFilters(int canId) {
         this.canId = canId;
