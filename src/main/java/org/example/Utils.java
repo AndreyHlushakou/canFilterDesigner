@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.entity.FilterCanPair;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -98,6 +100,13 @@ public final class Utils {
 
     }
 
+    public static Map<FilterCanPair, Set<Integer>> filtersForCanArr(int[] canId_arr) {
+        return maps.entrySet().stream()
+                .filter(entry -> entry.getValue().size() > 0)
+                .filter(entry -> entry.getValue().stream().allMatch(in -> Arrays.stream(canId_arr).anyMatch(can -> in == can)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
     //для вывода
     static {
         StringBuilder str_ = new StringBuilder("HEX  | BIN\n");
@@ -146,8 +155,8 @@ public final class Utils {
     }
 
     //вывод всех значения для карты фильтров
-    public static void soutAllMaps() {
-        maps.forEach((key, value) -> {
+    public static void soutMaps(Map<FilterCanPair, Set<Integer>> maps0) {
+        maps0.forEach((key, value) -> {
             System.out.println(key);
             value.stream().map(Utils::intToHex).forEach((i) -> System.out.print(i +" "));
             System.out.println();
