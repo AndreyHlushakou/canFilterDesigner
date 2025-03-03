@@ -5,6 +5,7 @@ import org.example.entity.FilterCanPair;
 import java.util.*;
 
 import static org.example.Utils.*;
+import static org.example.Utils.filtersForCanArr;
 
 public class Main {
 
@@ -30,11 +31,11 @@ public class Main {
     };
 
     public static void main(String[] args) {
-        int FilterMaskId = 0x00;
-        int FilterId     = 0x00;
-//        int FilterMaskId = 0b11001000;
-//        int FilterId     = 0b00000000;
-//        checkCanId(FilterMaskId, FilterId);
+//        int FilterMaskId = 0x00;
+//        int FilterId     = 0x00;
+        int FilterMaskId = 0b1100_1100;
+        int FilterId     = 0b0000_0000;
+        checkCanId(FilterMaskId, FilterId);
 
         /////////////////////////////////////////////////////////
 //        soutMaps(maps);
@@ -45,10 +46,9 @@ public class Main {
 //        System.out.println("filtersForCanArr.size=" + maps.size());
 
         /////////////////////////////////////////////////////////
-        Map<FilterCanPair, Set<Integer>> filtersForCanArr = filtersForCanArr(canId_arr);
-//        System.out.println("filtersForCanArr.size=" + filtersForCanArr.size());
-//        soutMaps(filtersForCanArr);
-
+        Map<FilterCanPair, Set<Integer>> filtersForCanArr = filtersForCanArr(canId_arr, 1);
+//        soutSortedMapsBySize(filtersForCanArr);
+//        soutMapsBySize(filtersForCanArr);
 
 
     }

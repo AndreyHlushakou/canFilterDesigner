@@ -100,10 +100,14 @@ public final class Utils {
 
     }
 
-    public static Map<FilterCanPair, Set<Integer>> filtersForCanArr(int[] canId_arr) {
+    public static Map<FilterCanPair, Set<Integer>> filtersForCanArr(int[] canId_arr, int valueSize) {
         return maps.entrySet().stream()
-                .filter(entry -> entry.getValue().size() > 0)
-                .filter(entry -> entry.getValue().stream().allMatch(in -> Arrays.stream(canId_arr).anyMatch(can -> in == can)))
+                .filter(entry -> entry.getValue().size() > valueSize)
+                .filter(entry ->
+                        entry.getValue().stream()
+                        .allMatch(canId_filter ->
+                                Arrays.stream(canId_arr)
+                                .anyMatch(canId -> canId_filter == canId)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -160,7 +164,6 @@ public final class Utils {
             System.out.println(key);
             value.stream().map(Utils::intToHex).forEach((i) -> System.out.print(i +" "));
             System.out.println();
-            System.out.println();
         });
     }
 
@@ -176,5 +179,39 @@ public final class Utils {
             }
         }
         System.out.println(map);
+    }
+
+    public static void soutMapsBySize(Map<FilterCanPair, Set<Integer>> filtersForCanArr) {
+        Map<Integer, Map<FilterCanPair, Set<Integer>>> mapMap = filtersForCanArr.values()
+                .stream()
+                .map(Set::size)
+                .distinct()
+                .collect(Collectors.toMap(
+                        s -> s,
+                        s -> filtersForCanArr.entrySet().stream()
+                                .filter(e -> e.getValue().size() == s)
+                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                ));
+
+        mapMap.entrySet().stream().sorted(Map.Entry.comparingByKey())
+                .forEach((e) -> {
+                    System.out.println("sizes=" + e.getKey());
+                    System.out.println("maps=");
+                    soutMaps(e.getValue());
+                    System.out.println();
+                });
+    }
+
+    public static void soutSortedMapsBySize(Map<FilterCanPair, Set<Integer>> filtersForCanArr) {
+        Map<FilterCanPair, Set<Integer>> filtersForCanArrSorted = filtersForCanArr.entrySet().stream()
+                .sorted((e1, e2) -> Integer.compare(e2.getValue().size(), e1.getValue().size())) // сортируем по размеру Set<Integer>
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, // если есть дубликаты (в данном случае не должно быть)
+                        LinkedHashMap::new // сохраняем порядок
+                ));
+//        System.out.println("filtersForCanArr.size=" + filtersForCanArr.size());
+        soutMaps(filtersForCanArrSorted);
     }
 }
