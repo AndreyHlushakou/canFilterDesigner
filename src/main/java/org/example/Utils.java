@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.entity.FilterCanPair;
+import org.example.entity.OneFilterAndExtra;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -214,4 +215,23 @@ public final class Utils {
 //        System.out.println("filtersForCanArr.size=" + filtersForCanArr.size());
         soutMaps(filtersForCanArrSorted);
     }
+
+
+    public static void soutMapMap(Map<Integer, Set<OneFilterAndExtra>> mapMap ) {
+        mapMap.entrySet().forEach(e1 -> {
+            System.out.println("canId:" + String.format("0x%02X", e1.getKey()));
+            System.out.println("set filters len:" + e1.getValue().size());
+            e1.getValue().stream()
+                    .sorted(OneFilterAndExtra.Comparator1.comparator)
+                    .filter(v1 -> v1.getExtraSa().size() < 10)
+                    .forEach(v1 -> {
+//                        System.out.println("Filter:" + v1.getFilterCanPair());
+//                        System.out.println("Extra :" + v1.getExtraSa());
+//                        System.out.println("Needed :" + v1.getNeededSa());
+                        System.out.println("E.L:" + v1.getExtraSa().size() + " N.L:" + v1.getNeededSa().size());
+                    });
+            System.out.println();
+        });
+    }
+
 }

@@ -1,25 +1,18 @@
 package org.example.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
 import java.util.Objects;
 
 import static org.example.Utils.intToHex;
 
+@AllArgsConstructor
+@Getter
 public class FilterCanPair {
     private final int FilterMaskId;
     private final int FilterId;
-
-    public FilterCanPair(int filterMaskId, int filterId) {
-        FilterMaskId = filterMaskId;
-        FilterId = filterId;
-    }
-
-    public int getFilterMaskId() {
-        return FilterMaskId;
-    }
-
-    public int getFilterId() {
-        return FilterId;
-    }
 
     @Override
     public String toString() {
