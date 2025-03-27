@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.example.IntTernaryOperator.INT_TERNARY_OPERATOR;
+import static org.example.entity.OneFilter.comparatorOneFilter;
 
 public final class Utils {
 
@@ -217,18 +218,18 @@ public final class Utils {
     }
 
 
-    public static void soutMapMapLessThan10(Map<Integer, Set<OneFilter>> mapMap ) {
+    public static void soutMapMapLessThan(Map<Integer, Set<OneFilter>> mapMap) {
         mapMap.entrySet().forEach(e1 -> {
             System.out.println("canId:" + String.format("0x%02X", e1.getKey()));
             System.out.println("set filters len:" + e1.getValue().size());
             e1.getValue().stream()
-                    .sorted(OneFilter.ComparatorOneFilter.comparatorOneFilter)
-                    .filter(v1 -> v1.getExtraSa().size() < 10)
+                    .sorted(comparatorOneFilter)
+//                    .filter(v1 -> v1.getExtraSa().size() <= 10)
                     .forEach(v1 -> {
 //                        System.out.println("Filter:" + v1.getFilterCanPair());
 //                        System.out.println("Extra :" + v1.getExtraSa());
 //                        System.out.println("Needed :" + v1.getNeededSa());
-                        System.out.println("E.L:" + v1.getExtraSa().size() + " N.L:" + v1.getNeededSa().size());
+                        System.out.println("N.L:" + v1.getNeededSa().size() + " --- " + "E.L:" + v1.getExtraSa().size());
                     });
             System.out.println();
         });

@@ -36,13 +36,21 @@ public class OneFilter {
                 '}';
     }
 
-    public static class ComparatorOneFilter implements Comparator<OneFilter> {
-        public static Comparator<OneFilter> comparatorOneFilter = new ComparatorOneFilter();
+    public static Comparator<OneFilter> comparatorOneFilter = new ComparatorByExtraSa().thenComparing(new ComparatorByNeededSa().reversed());
 
+    public static class ComparatorByExtraSa implements Comparator<OneFilter> {
         @Override
         public int compare(OneFilter o1, OneFilter o2) {
             return Integer.compare(o1.getExtraSa().size(), o2.getExtraSa().size());
         }
     }
+
+    public static class ComparatorByNeededSa implements Comparator<OneFilter> {
+        @Override
+        public int compare(OneFilter o1, OneFilter o2) {
+            return Integer.compare(o1.getNeededSa().size(), o2.getNeededSa().size());
+        }
+    }
+
 }
 

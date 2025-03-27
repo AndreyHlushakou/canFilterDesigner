@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.example.Utils.*;
-import static org.example.entity.OneFilter.ComparatorOneFilter.comparatorOneFilter;
+import static org.example.entity.OneFilter.comparatorOneFilter;
 
 public class Main {
 
@@ -80,10 +80,11 @@ public class Main {
                                                         .anyMatch(c -> c.equals(v)))
                                                 .collect(Collectors.toSet())))
                                 .sorted(comparatorOneFilter)
-                                .limit(50)
+//                                .filter(s -> s.getExtraSa().size() < 32)
+                                .filter(s -> s.getExtraSa().size() < s.getNeededSa().size()*2)
                                 .collect(Collectors.toCollection(LinkedHashSet::new))
                 ));
-//        soutMapMapLessThan10(mapSet);
+        soutMapMapLessThan(mapSet);
 
         Set<SetFilter> setFilters = new Main().startProcess(mapSet, canId_arr);
         System.out.println(setFilters);
