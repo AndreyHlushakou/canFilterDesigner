@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.example.Utils.*;
+import static org.example.entity.OneFilter.ComparatorOneFilter.comparatorOneFilter;
 
 public class Main {
 
@@ -78,11 +79,13 @@ public class Main {
                                                         .boxed()
                                                         .anyMatch(c -> c.equals(v)))
                                                 .collect(Collectors.toSet())))
-                                .collect(Collectors.toSet())
+                                .sorted(comparatorOneFilter)
+                                .limit(50)
+                                .collect(Collectors.toCollection(LinkedHashSet::new))
                 ));
-//        soutMapMap(mapSet);
-        Set<SetFilter> setFilters = new Main().startProcess(mapSet, canId_arr);
+//        soutMapMapLessThan10(mapSet);
 
+        Set<SetFilter> setFilters = new Main().startProcess(mapSet, canId_arr);
         System.out.println(setFilters);
     }
 
@@ -104,6 +107,7 @@ public class Main {
         tail.next = endNode;
         Set<Integer> canId_set = Arrays.stream(canId_arr).boxed().collect(Collectors.toSet());
         Set<SetFilter> setFilters = new HashSet<>();
+//        System.gc();
         endNode.createEndProcess(canId_set, setFilters);
         head.runProcess();
 
@@ -154,10 +158,20 @@ public class Main {
                 Set<Integer> neededSaBuff = this.prev.neededSa;
                 if (neededSaBuff.containsAll(canId_arr)) {
                     Set<FilterCanPair> filterCanPairsBuff = this.prev.filterCanPairs;
-                    Set<Integer> extraSaBuff = this.prev.extraSa;
-                    SetFilter setFilter = new SetFilter(filterCanPairsBuff, extraSaBuff);
-                    setFilters.add(setFilter);
+
+                    if (filterCanPairsBuff.size() < 14) {
+                        Set<Integer> extraSaBuff = this.prev.extraSa;
+                        SetFilter setFilter = new SetFilter(filterCanPairsBuff, extraSaBuff);
+                        setFilters.add(setFilter);
+//                        if (extraSaBuff.isEmpty()) {
+//                            System.out.println(filterCanPairsBuff.size());
+//                            System.out.println(filterCanPairsBuff);
+//                            System.exit(0);
+//                        }
+                    }
+
                 }
+//                System.gc();
             };
         }
 

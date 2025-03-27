@@ -217,12 +217,12 @@ public final class Utils {
     }
 
 
-    public static void soutMapMap(Map<Integer, Set<OneFilter>> mapMap ) {
+    public static void soutMapMapLessThan10(Map<Integer, Set<OneFilter>> mapMap ) {
         mapMap.entrySet().forEach(e1 -> {
             System.out.println("canId:" + String.format("0x%02X", e1.getKey()));
             System.out.println("set filters len:" + e1.getValue().size());
             e1.getValue().stream()
-                    .sorted(OneFilter.Comparator1.comparator)
+                    .sorted(OneFilter.ComparatorOneFilter.comparatorOneFilter)
                     .filter(v1 -> v1.getExtraSa().size() < 10)
                     .forEach(v1 -> {
 //                        System.out.println("Filter:" + v1.getFilterCanPair());

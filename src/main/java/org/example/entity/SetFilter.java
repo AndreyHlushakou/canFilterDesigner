@@ -28,8 +28,8 @@ public class SetFilter {
     @Override
     public String toString() {
         return "SetFilter{" +
-                "filterCanPairs=" + filterCanPairs +
-                ", extraSaBuff=" + extraSaBuff +
+                "\nfilterCanPairs=" + filterCanPairs +
+                "\nextraSaBuff=" + extraSaBuff +
                 '}';
     }
 }

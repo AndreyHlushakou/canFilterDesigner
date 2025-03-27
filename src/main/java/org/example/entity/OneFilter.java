@@ -36,8 +36,8 @@ public class OneFilter {
                 '}';
     }
 
-    public static class Comparator1 implements Comparator<OneFilter> {
-        public static Comparator<OneFilter> comparator = new Comparator1();
+    public static class ComparatorOneFilter implements Comparator<OneFilter> {
+        public static Comparator<OneFilter> comparatorOneFilter = new ComparatorOneFilter();
 
         @Override
         public int compare(OneFilter o1, OneFilter o2) {

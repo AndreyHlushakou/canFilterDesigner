@@ -16,10 +16,10 @@ public class FilterCanPair {
 
     @Override
     public String toString() {
-        return "FilterCanPair{" +
-                "FilterMaskId=" + intToHex(FilterMaskId) +
-                ", FilterId=" + intToHex(FilterId) +
-                '}';
+        return "\nFilterCanPair{" +
+                "\nFilterMaskId=" + intToHex(FilterMaskId) +
+                "\nFilterId=" + intToHex(FilterId) +
+                "}\n";
     }
 
     @Override
