@@ -9,7 +9,7 @@ import java.util.Set;
 
 @AllArgsConstructor
 @Getter
-public class OneFilterAndExtra{
+public class OneFilter {
     private FilterCanPair filterCanPair;
     private Set<Integer> extraSa;
     private Set<Integer> neededSa;
@@ -18,7 +18,7 @@ public class OneFilterAndExtra{
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        OneFilterAndExtra that = (OneFilterAndExtra) o;
+        OneFilter that = (OneFilter) o;
         return Objects.equals(filterCanPair, that.filterCanPair) && Objects.equals(extraSa, that.extraSa) && Objects.equals(neededSa, that.neededSa);
     }
 
@@ -36,11 +36,11 @@ public class OneFilterAndExtra{
                 '}';
     }
 
-    public static class Comparator1 implements Comparator<OneFilterAndExtra> {
-        public static Comparator<OneFilterAndExtra> comparator = new Comparator1();
+    public static class Comparator1 implements Comparator<OneFilter> {
+        public static Comparator<OneFilter> comparator = new Comparator1();
 
         @Override
-        public int compare(OneFilterAndExtra o1, OneFilterAndExtra o2) {
+        public int compare(OneFilter o1, OneFilter o2) {
             return Integer.compare(o1.getExtraSa().size(), o2.getExtraSa().size());
         }
     }

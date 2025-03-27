@@ -1,10 +1,10 @@
 package org.example;
 
-import lombok.NoArgsConstructor;
-import org.example.entity.OneFilterAndExtra;
+import org.example.entity.FilterCanPair;
+import org.example.entity.OneFilter;
+import org.example.entity.SetFilter;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.example.Utils.*;
@@ -56,7 +56,7 @@ public class Main {
         process(canId_arr);
     }
 
-    static Map<Integer, Set<OneFilterAndExtra>> mapSet;
+    static Map<Integer, Set<OneFilter>> mapSet;
 
     public static void process(int[] canId_arr) {
         mapSet = Arrays.stream(canId_arr)
@@ -68,7 +68,7 @@ public class Main {
                         i -> maps.entrySet().stream()
                                 .filter(e -> e.getValue().stream()
                                         .anyMatch(v -> v.equals(i)))
-                                .map(e -> new OneFilterAndExtra(
+                                .map(e -> new OneFilter(
                                         e.getKey(), //filterCanPair
                                         e.getValue().stream() //extraSa
                                                 .filter(v -> !v.equals(i))
@@ -81,32 +81,88 @@ public class Main {
                                 .collect(Collectors.toSet())
                 ));
 //        soutMapMap(mapSet);
+        Set<SetFilter> setFilters = new Main().startProcess(mapSet, canId_arr);
 
+        System.out.println(setFilters);
     }
 
-    public void startRecursive(Map<Integer, Set<OneFilterAndExtra>> mapSet, int[] canId_arr, int position) {
-        Chain chain = new Chain();
-        for (Set<OneFilterAndExtra> value : mapSet.values()) {
-            value
+    public  Set<SetFilter> startProcess(Map<Integer, Set<OneFilter>> mapSet, int[] canId_arr) {
+        Node head;
+        Node tail = new Node(null, null);
+        head = tail;
+        tail.extraSa = new HashSet<>();
+        tail.neededSa = new HashSet<>();
+        tail.filterCanPairs = new HashSet<>();
+        for (Set<OneFilter> value : mapSet.values()) {
+            Node newNode = new Node(tail, null);
+            newNode.createProcess(value);
+
+            tail.next = newNode;
+            tail = newNode;
         }
+        Node endNode = new Node(tail, null);
+        tail.next = endNode;
+        Set<Integer> canId_set = Arrays.stream(canId_arr).boxed().collect(Collectors.toSet());
+        Set<SetFilter> setFilters = new HashSet<>();
+        endNode.createEndProcess(canId_set, setFilters);
+        head.runProcess();
+
+        return setFilters;
     }
 
-    public static void recursive() {
-
+    interface MyFunction {
+        void process();
     }
 
+    class Node {
+        private final Node prev;
+        private Node next;
 
-    class Chain {
+        public Node(Node prev, Node next) {
+            this.prev = prev;
+            this.next = next;
+        }
 
-        Function<Set<OneFilterAndExtra>,Integer> function = (value, list, nextFunction) -> {
-            for (OneFilterAndExtra oneFilterAndExtra : value) {
+        MyFunction function;
+        Set<Integer> extraSa;
+        Set<Integer> neededSa;
+        Set<FilterCanPair> filterCanPairs;
 
-            }
-            return
-        };
+        public void createProcess(Set<OneFilter> value) {
+            this.function = () -> {
+                for (OneFilter v : value) {
+                    Set<Integer> extraSaBuff = new HashSet<>(v.getExtraSa());
+                    Set<Integer> neededSaBuff = new HashSet<>(v.getNeededSa());
+                    Set<FilterCanPair> filterCanPairsBuff = new HashSet<>();
+                    filterCanPairsBuff.add(v.getFilterCanPair());
 
-        public void join(Set<OneFilterAndExtra> value) {
+                    extraSaBuff.addAll(this.prev.extraSa);
+                    neededSaBuff.addAll(this.prev.neededSa);
+                    filterCanPairsBuff.addAll(this.prev.filterCanPairs);
 
+                    this.extraSa = extraSaBuff;
+                    this.neededSa = neededSaBuff;
+                    this.filterCanPairs = filterCanPairsBuff;
+
+                    this.next.function.process();
+                }
+            };
+        }
+
+        public void createEndProcess(Set<Integer> canId_arr, Set<SetFilter> setFilters) {
+            this.function = () -> {
+                Set<Integer> neededSaBuff = this.prev.neededSa;
+                if (neededSaBuff.containsAll(canId_arr)) {
+                    Set<FilterCanPair> filterCanPairsBuff = this.prev.filterCanPairs;
+                    Set<Integer> extraSaBuff = this.prev.extraSa;
+                    SetFilter setFilter = new SetFilter(filterCanPairsBuff, extraSaBuff);
+                    setFilters.add(setFilter);
+                }
+            };
+        }
+
+        public void runProcess() {
+            this.next.function.process();
         }
 
     }
