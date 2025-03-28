@@ -2,13 +2,15 @@ package org.example;
 
 import org.example.entity.FilterCanPair;
 import org.example.entity.PairCanId;
+import org.example.subset.SubsetGenerationParallel2;
 
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.example.Utils.*;
-import static org.example.entity.PairCanId.comparatorPairCanId;
 
 public class Main {
 
@@ -101,20 +103,19 @@ public class Main {
 //                });
 //        System.out.println(maps4.size());
 
-        List<Map.Entry<FilterCanPair, PairCanId>> listMaps4 = maps4.entrySet().stream().toList();
-        Consumer<List<Map.Entry<FilterCanPair, PairCanId>>> consumer = (subset) -> {
+        List<Map.Entry<FilterCanPair, PairCanId>> original = maps4.entrySet().stream().toList();
+
+        Consumer<List<Map.Entry<FilterCanPair, PairCanId>>> consumerOriginal = (subset) -> {
             Set<Integer> subsetNeeded = subset.stream()
                     .flatMap(s -> s.getValue().getNeededSa().stream())
                     .collect(Collectors.toSet());
-            boolean isContains = canId_list.containsAll(subsetNeeded);
+            boolean isContains = new HashSet<>(canId_list).containsAll(subsetNeeded);
             if (isContains) {
                 System.out.println(subset);
-                System.exit(0);
+//                System.exit(0);
             }
         };
 
     }
-
-
 
 }
