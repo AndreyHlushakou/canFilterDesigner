@@ -4,6 +4,7 @@ import org.example.entity.FilterCanPair;
 import org.example.entity.OneFilter;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -23,6 +24,9 @@ public final class Utils {
 
     //карта всех возможных фильтров (со списком значений удовлетворяющих этот фильтр) для диапазона 0x00-0xFF
     public static Map<FilterCanPair, Set<Integer>> maps;
+
+    //карта всех элементов и списком их фильтров с нужными и лишними значениями
+    public static Map<Integer, Set<OneFilter>> mapSet;
 
 
     static {
@@ -172,14 +176,17 @@ public final class Utils {
     //сортировка и вывод количества элементов для карты фильтров
     public static void soutQuantitySizeMaps() {
         Map<Integer, Integer> map = new TreeMap<>();
+        int count = 0;
         for (Map.Entry<FilterCanPair, Set<Integer>> filterCanPairListEntry : maps.entrySet()) {
             int size = filterCanPairListEntry.getValue().size();
+            count +=size;
             if (map.containsKey(size)) {
                 map.compute(size, (k, old_quantity) -> old_quantity + 1);
             } else {
                 map.put(size, 1);
             }
         }
+        System.out.println(count);
         System.out.println(map);
     }
 
@@ -218,10 +225,15 @@ public final class Utils {
     }
 
 
-    public static void soutMapMapLessThan(Map<Integer, Set<OneFilter>> mapMap) {
-        mapMap.entrySet().forEach(e1 -> {
-            System.out.println("canId:" + String.format("0x%02X", e1.getKey()));
-            System.out.println("set filters len:" + e1.getValue().size());
+    public static void soutMapMapLessThan(Map<Integer, Set<OneFilter>> mapSet) {
+        AtomicInteger count = new AtomicInteger();
+        mapSet.entrySet().forEach(e1 -> {
+            int key = e1.getKey();
+            int size = e1.getValue().size();
+            System.out.println("canId:" + String.format("0x%02X", key));
+            System.out.println("set filters len:" + size);
+
+            count.addAndGet(size);
             e1.getValue().stream()
                     .sorted(comparatorOneFilter)
 //                    .filter(v1 -> v1.getExtraSa().size() <= 10)
@@ -229,10 +241,44 @@ public final class Utils {
 //                        System.out.println("Filter:" + v1.getFilterCanPair());
 //                        System.out.println("Extra :" + v1.getExtraSa());
 //                        System.out.println("Needed :" + v1.getNeededSa());
-                        System.out.println("N.L:" + v1.getNeededSa().size() + " --- " + "E.L:" + v1.getExtraSa().size());
+//                        System.out.println("N.L:" + v1.getNeededSa().size() + " --- " + "E.L:" + v1.getExtraSa().size());
                     });
             System.out.println();
         });
+        System.out.println(count);
+    }
+
+    public static Map<Integer, Set<OneFilter>> createMapSet(int[] canId_arr) {
+        mapSet = Arrays.stream(canId_arr)
+                .boxed()
+                .collect(Collectors.toMap(
+                        //canId
+                        i -> i,
+                        //Set<OneFilterAndExtra>
+                        i -> maps.entrySet().stream()
+                                .filter(e -> e.getValue().stream()
+                                        .anyMatch(v -> v.equals(i)))
+                                .map(e -> new OneFilter(
+                                        e.getKey(), //filterCanPair
+                                        e.getValue().stream() //extraSa
+                                                .filter(v -> !v.equals(i))
+                                                .collect(Collectors.toSet()),
+                                        e.getValue().stream() //neededSa
+                                                .filter((v) -> Arrays.stream(canId_arr)
+                                                        .boxed()
+                                                        .anyMatch(c -> c.equals(v)))
+                                                .collect(Collectors.toSet())))
+                                .sorted(comparatorOneFilter)
+//                                .filter(s -> s.getExtraSa().size() < 32)
+                                .filter(s -> s.getExtraSa().size() < s.getNeededSa().size()*2)
+                                .collect(Collectors.toCollection(LinkedHashSet::new))
+                ));
+//        soutMapMapLessThan(mapSet);
+
+//        Set<SetFilter> setFilters = new ProcessLoop().startProcess(mapSet, canId_arr);
+//        System.out.println(setFilters);
+
+        return mapSet;
     }
 
 }

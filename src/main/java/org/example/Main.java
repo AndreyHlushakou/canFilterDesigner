@@ -1,14 +1,14 @@
 package org.example;
 
 import org.example.entity.FilterCanPair;
-import org.example.entity.OneFilter;
-import org.example.entity.SetFilter;
+import org.example.entity.PairCanId;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.example.Utils.*;
-import static org.example.entity.OneFilter.comparatorOneFilter;
+import static org.example.entity.PairCanId.comparatorPairCanId;
 
 public class Main {
 
@@ -33,6 +33,8 @@ public class Main {
 
     };
 
+    public static List<Integer> canId_list = Arrays.stream(canId_arr).boxed().collect(Collectors.toList());
+
     public static void main(String[] args) {
 //        int FilterMaskId = 0xC8;
 //        int FilterId     = 0x00;
@@ -54,133 +56,65 @@ public class Main {
 //        soutMapsBySize(filtersForCanArr);
 
         /////////////////////////////////////////////////////////
-        process(canId_arr);
+//        createMapSet(canId_arr);
+
+        process();
     }
 
-    static Map<Integer, Set<OneFilter>> mapSet;
+    public static void process() {
+        Map<FilterCanPair, Set<Integer>> maps2 = maps.entrySet().stream()
+                .filter(e -> e.getValue().stream()
+                        .anyMatch(v -> canId_list.stream()
+                                .anyMatch(c -> c.equals(v))))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+//        soutMaps(maps2);
 
-    public static void process(int[] canId_arr) {
-        mapSet = Arrays.stream(canId_arr)
-                .boxed()
+        Map<FilterCanPair, PairCanId> maps3 = maps2.entrySet().stream()
                 .collect(Collectors.toMap(
-                        //canId
-                        i -> i,
-                        //Set<OneFilterAndExtra>
-                        i -> maps.entrySet().stream()
-                                .filter(e -> e.getValue().stream()
-                                        .anyMatch(v -> v.equals(i)))
-                                .map(e -> new OneFilter(
-                                        e.getKey(), //filterCanPair
-                                        e.getValue().stream() //extraSa
-                                                .filter(v -> !v.equals(i))
-                                                .collect(Collectors.toSet()),
-                                        e.getValue().stream() //neededSa
-                                                .filter((v) -> Arrays.stream(canId_arr)
-                                                        .boxed()
-                                                        .anyMatch(c -> c.equals(v)))
-                                                .collect(Collectors.toSet())))
-                                .sorted(comparatorOneFilter)
-//                                .filter(s -> s.getExtraSa().size() < 32)
-                                .filter(s -> s.getExtraSa().size() < s.getNeededSa().size()*2)
-                                .collect(Collectors.toCollection(LinkedHashSet::new))
+                        Map.Entry::getKey,
+                        e -> {
+                            Set<Integer> neededSa = e.getValue().stream()
+                                    .filter(v -> canId_list.stream()
+                                            .anyMatch(c -> c.equals(v)))
+                                    .collect(Collectors.toSet());
+                            Set<Integer> extraSa = e.getValue().stream()
+                                    .filter(v -> canId_list.stream()
+                                            .anyMatch(c -> !c.equals(v)))
+                                    .collect(Collectors.toSet());
+                            return new PairCanId(neededSa, extraSa);
+                        }
                 ));
-        soutMapMapLessThan(mapSet);
 
-        Set<SetFilter> setFilters = new Main().startProcess(mapSet, canId_arr);
-        System.out.println(setFilters);
-    }
+        Map<FilterCanPair, PairCanId> maps4 = maps3.entrySet().stream()
+                .filter(e -> e.getValue().getExtraSa().size() < e.getValue().getNeededSa().size()*2)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-    public  Set<SetFilter> startProcess(Map<Integer, Set<OneFilter>> mapSet, int[] canId_arr) {
-        Node head;
-        Node tail = new Node(null, null);
-        head = tail;
-        tail.extraSa = new HashSet<>();
-        tail.neededSa = new HashSet<>();
-        tail.filterCanPairs = new HashSet<>();
-        for (Set<OneFilter> value : mapSet.values()) {
-            Node newNode = new Node(tail, null);
-            newNode.createProcess(value);
+//        maps4.entrySet().stream()
+//                .sorted(Map.Entry.comparingByValue(comparatorPairCanId))
+//                .forEach(e -> {
+//                    System.out.print(e.getKey());
+//                    int sizeEx = e.getValue().getExtraSa().size();
+//                    int sizeNeed = e.getValue().getNeededSa().size();
+//                    System.out.println("N.L:" + sizeNeed + " --- " + "E.L:" + sizeEx);
+//                    System.out.println(e.getValue());
+//                    System.out.println();
+//                });
+//        System.out.println(maps4.size());
 
-            tail.next = newNode;
-            tail = newNode;
-        }
-        Node endNode = new Node(tail, null);
-        tail.next = endNode;
-        Set<Integer> canId_set = Arrays.stream(canId_arr).boxed().collect(Collectors.toSet());
-        Set<SetFilter> setFilters = new HashSet<>();
-//        System.gc();
-        endNode.createEndProcess(canId_set, setFilters);
-        head.runProcess();
-
-        return setFilters;
-    }
-
-    interface MyFunction {
-        void process();
-    }
-
-    class Node {
-        private final Node prev;
-        private Node next;
-
-        public Node(Node prev, Node next) {
-            this.prev = prev;
-            this.next = next;
-        }
-
-        MyFunction function;
-        Set<Integer> extraSa;
-        Set<Integer> neededSa;
-        Set<FilterCanPair> filterCanPairs;
-
-        public void createProcess(Set<OneFilter> value) {
-            this.function = () -> {
-                for (OneFilter v : value) {
-                    Set<Integer> extraSaBuff = new HashSet<>(v.getExtraSa());
-                    Set<Integer> neededSaBuff = new HashSet<>(v.getNeededSa());
-                    Set<FilterCanPair> filterCanPairsBuff = new HashSet<>();
-                    filterCanPairsBuff.add(v.getFilterCanPair());
-
-                    extraSaBuff.addAll(this.prev.extraSa);
-                    neededSaBuff.addAll(this.prev.neededSa);
-                    filterCanPairsBuff.addAll(this.prev.filterCanPairs);
-
-                    this.extraSa = extraSaBuff;
-                    this.neededSa = neededSaBuff;
-                    this.filterCanPairs = filterCanPairsBuff;
-
-                    this.next.function.process();
-                }
-            };
-        }
-
-        public void createEndProcess(Set<Integer> canId_arr, Set<SetFilter> setFilters) {
-            this.function = () -> {
-                Set<Integer> neededSaBuff = this.prev.neededSa;
-                if (neededSaBuff.containsAll(canId_arr)) {
-                    Set<FilterCanPair> filterCanPairsBuff = this.prev.filterCanPairs;
-
-                    if (filterCanPairsBuff.size() < 14) {
-                        Set<Integer> extraSaBuff = this.prev.extraSa;
-                        SetFilter setFilter = new SetFilter(filterCanPairsBuff, extraSaBuff);
-                        setFilters.add(setFilter);
-//                        if (extraSaBuff.isEmpty()) {
-//                            System.out.println(filterCanPairsBuff.size());
-//                            System.out.println(filterCanPairsBuff);
-//                            System.exit(0);
-//                        }
-                    }
-
-                }
-//                System.gc();
-            };
-        }
-
-        public void runProcess() {
-            this.next.function.process();
-        }
+        List<Map.Entry<FilterCanPair, PairCanId>> listMaps4 = maps4.entrySet().stream().toList();
+        Consumer<List<Map.Entry<FilterCanPair, PairCanId>>> consumer = (subset) -> {
+            Set<Integer> subsetNeeded = subset.stream()
+                    .flatMap(s -> s.getValue().getNeededSa().stream())
+                    .collect(Collectors.toSet());
+            boolean isContains = canId_list.containsAll(subsetNeeded);
+            if (isContains) {
+                System.out.println(subset);
+                System.exit(0);
+            }
+        };
 
     }
+
 
 
 }

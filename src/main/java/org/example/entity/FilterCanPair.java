@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import static org.example.Utils.intToHex;
@@ -35,20 +36,20 @@ public class FilterCanPair {
         return Objects.hash(FilterMaskId, FilterId);
     }
 
-//    public static final Comparator<FilterCanPair> comparator = new FilterCanPair.FilterCanId1().thenComparing(new FilterCanPair.FilterCanId2());
-//
-//    static class FilterCanId1 implements Comparator<FilterCanPair> {
-//        @Override
-//        public int compare(FilterCanPair o1, FilterCanPair o2) {
-//            return Integer.compare(o1.getFilterMaskId(), o2.getFilterMaskId());
-//        }
-//    }
-//
-//    static class FilterCanId2 implements Comparator<FilterCanPair> {
-//        @Override
-//        public int compare(FilterCanPair o1, FilterCanPair o2) {
-//            return Integer.compare(o1.getFilterId(), o2.getFilterId());
-//        }
-//    }
+    public static final Comparator<FilterCanPair> comparator = new FilterCanPair.FilterCanId1().thenComparing(new FilterCanPair.FilterCanId2());
+
+    static class FilterCanId1 implements Comparator<FilterCanPair> {
+        @Override
+        public int compare(FilterCanPair o1, FilterCanPair o2) {
+            return Integer.compare(o1.getFilterMaskId(), o2.getFilterMaskId());
+        }
+    }
+
+    static class FilterCanId2 implements Comparator<FilterCanPair> {
+        @Override
+        public int compare(FilterCanPair o1, FilterCanPair o2) {
+            return Integer.compare(o1.getFilterId(), o2.getFilterId());
+        }
+    }
 
 }

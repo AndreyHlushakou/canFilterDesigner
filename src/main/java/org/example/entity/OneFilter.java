@@ -11,32 +11,32 @@ import java.util.Set;
 @Getter
 public class OneFilter {
     private FilterCanPair filterCanPair;
-    private Set<Integer> extraSa;
     private Set<Integer> neededSa;
+    private Set<Integer> extraSa;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        OneFilter that = (OneFilter) o;
-        return Objects.equals(filterCanPair, that.filterCanPair) && Objects.equals(extraSa, that.extraSa) && Objects.equals(neededSa, that.neededSa);
+        OneFilter oneFilter = (OneFilter) o;
+        return Objects.equals(filterCanPair, oneFilter.filterCanPair) && Objects.equals(neededSa, oneFilter.neededSa) && Objects.equals(extraSa, oneFilter.extraSa);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(filterCanPair, extraSa, neededSa);
+        return Objects.hash(filterCanPair, neededSa, extraSa);
     }
 
     @Override
     public String toString() {
-        return "OneFilterAndExtra{" +
+        return "OneFilter{" +
                 "\nfilterCanPair=" + filterCanPair +
-                "\nextraSa=" + extraSa +
                 "\nneededSa=" + neededSa +
+                "\nextraSa=" + extraSa +
                 '}';
     }
 
-    public static Comparator<OneFilter> comparatorOneFilter = new ComparatorByExtraSa().thenComparing(new ComparatorByNeededSa().reversed());
+    public static Comparator<OneFilter> comparatorOneFilter = new ComparatorByNeededSa().reversed();//new ComparatorByExtraSa().thenComparing(new ComparatorByNeededSa().reversed());
 
     public static class ComparatorByExtraSa implements Comparator<OneFilter> {
         @Override

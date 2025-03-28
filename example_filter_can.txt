@@ -1,132 +1,162 @@
 STATIC void en_flt(void)
 {
+    // conf can
     CAN_FilterInitTypeDef filter;
 
     filter.CAN_FilterFIFOAssignment = CAN_FIFO0;
     filter.CAN_FilterActivation = ENABLE;
-    filter.CAN_FilterMode = CAN_FilterMode_IdMask;
     filter.CAN_FilterScale = CAN_FilterScale_32bit;
-    // conf can
-    filter.CAN_FilterIdHigh     = (uint16_t)(0x000000FA >> 13);
-    filter.CAN_FilterIdLow      = (uint16_t)(0x000000FA << 3) | 0x04;
+
+    //ALL    SA(1):FA
+    //NEEDED SA(1):FA
+    //EXTRA  SA(0):
+    filter.CAN_FilterMode = CAN_FilterMode_IdMask;
     filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000FF >> 13);
     filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000FF << 3) | 0x04;
+    filter.CAN_FilterIdHigh     = (uint16_t)(0x000000FA >> 13);
+    filter.CAN_FilterIdLow      = (uint16_t)(0x000000FA << 3) | 0x04;
     filter.CAN_FilterNumber = 0;
     CAN_FilterInit(&filter);
+
     // maz monitoring
     if (fsys->sysp[SYSP_EGTS_TRCK_ON] && fsys->sysp[SYSP_MON_PROTOCOL] == 1)
     {
         //how to work FILTER mode MASK: if( (canId & FilterMaskId) == FilterId ) -> let in this canId
-        //count NEEDED SA:23
-        //count EXTRA  SA:28
+        //count ALL    SA:95
+        //count NEEDED SA:50
+        //count EXTRA  SA:45
 
 
-        //00,01,04,05,80,81,84,85
-        //NEEDED SA:00,85
-        //EXTRA  SA:01,04,05,80,81,84
+        //ALL    SA(32):00-1F
+        //NEEDED SA(20):00-09, 0B, 0F-12, 17, 19, 1C-1E
+        //EXTRA  SA(12):0A, 0C-0E, 13-16, 18, 1A, 1B, 1F
         filter.CAN_FilterMode = CAN_FilterMode_IdMask;
+        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000E0 >> 13);
+        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000E0 << 3) | 0x04;
         filter.CAN_FilterIdHigh     = (uint16_t)(0x00000000 >> 13);
         filter.CAN_FilterIdLow      = (uint16_t)(0x00000000 << 3) | 0x04;
-        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x0000007A >> 13);
-        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x0000007A << 3) | 0x04;
         filter.CAN_FilterNumber = 1;
         CAN_FilterInit(&filter);
 
-        //09,0B,19,1B,49,4B,59,5B
-        //NEEDED SA:0B,19,59
-        //EXTRA  SA:09,1B,49,4B,5B
+        //ALL    SA(8):20-23, 30-33
+        //NEEDED SA(7):20-23, 30-32
+        //EXTRA  SA(1):33
         filter.CAN_FilterMode = CAN_FilterMode_IdMask;
-        filter.CAN_FilterIdHigh     = (uint16_t)(0x00000009 >> 13);
-        filter.CAN_FilterIdLow      = (uint16_t)(0x00000009 << 3) | 0x04;
-        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000AD >> 13);
-        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000AD << 3) | 0x04;
+        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000EC >> 13);
+        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000EC << 3) | 0x04;
+        filter.CAN_FilterIdHigh     = (uint16_t)(0x00000020 >> 13);
+        filter.CAN_FilterIdLow      = (uint16_t)(0x00000020 << 3) | 0x04;
         filter.CAN_FilterNumber = 2;
         CAN_FilterInit(&filter);
 
-        //07,17,47,57
-        //NEEDED SA:17,47
-        //EXTRA  SA:07,57
+        //ALL    SA(4):20, 24 ,28 ,2C
+        //NEEDED SA(2):(20), 24 ,28
+        //EXTRA  SA(1):2C
         filter.CAN_FilterMode = CAN_FilterMode_IdMask;
-        filter.CAN_FilterIdHigh     = (uint16_t)(0x00000007 >> 13);
-        filter.CAN_FilterIdLow      = (uint16_t)(0x00000007 << 3) | 0x04;
-        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000AF >> 13);
-        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000AF << 3) | 0x04;
+        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000F3 >> 13);
+        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x00000020 << 3) | 0x04;
+        filter.CAN_FilterIdHigh     = (uint16_t)(0x000000F3 >> 13);
+        filter.CAN_FilterIdLow      = (uint16_t)(0x00000020 << 3) | 0x04;
         filter.CAN_FilterNumber = 3;
         CAN_FilterInit(&filter);
 
-        //1C-1F
-        //NEEDED SA:1D,1E
-        //EXTRA  SA:1C,1F
+        //ALL    SA(8):2A, 2B, 2E, 2F, 3A, 3B, 3E, 3F
+        //NEEDED SA(2):2F, 3A
+        //EXTRA  SA(6):2A, 2B, 2E, 3B, 3E, 3F
         filter.CAN_FilterMode = CAN_FilterMode_IdMask;
-        filter.CAN_FilterIdHigh     = (uint16_t)(0x0000001C >> 13);
-        filter.CAN_FilterIdLow      = (uint16_t)(0x0000001C << 3) | 0x04;
-        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000FC >> 13);
-        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000FC << 3) | 0x04;
+        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000EA >> 13);
+        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000EA << 3) | 0x04;
+        filter.CAN_FilterIdHigh     = (uint16_t)(0x0000002A >> 13);
+        filter.CAN_FilterIdLow      = (uint16_t)(0x0000002A << 3) | 0x04;
         filter.CAN_FilterNumber = 4;
         CAN_FilterInit(&filter);
 
-        //30-33
-        //NEEDED SA:30,31,32
-        //EXTRA  SA:33
+        //ALL    SA(4):45, 47, 4D, 4F
+        //NEEDED SA(2):47, 4D
+        //EXTRA  SA(2):45, 4F
         filter.CAN_FilterMode = CAN_FilterMode_IdMask;
-        filter.CAN_FilterIdHigh     = (uint16_t)(0x00000030 >> 13);
-        filter.CAN_FilterIdLow      = (uint16_t)(0x00000030 << 3) | 0x04;
-        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000FC >> 13);
-        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000FC << 3) | 0x04;
+        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000F5 >> 13);
+        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000F5 << 3) | 0x04;
+        filter.CAN_FilterIdHigh     = (uint16_t)(0x00000045 >> 13);
+        filter.CAN_FilterIdLow      = (uint16_t)(0x00000045 << 3) | 0x04;
         filter.CAN_FilterNumber = 5;
         CAN_FilterInit(&filter);
 
-        //0D,2D,4D,6D,8D,AD,CD,ED
-        //NEEDED SA:4D,AD
-        //EXTRA  SA:0D,2D,6D,8D,CD,ED
+        //ALL    SA(8):50-53, 58-5B
+        //NEEDED SA(2):52, 59
+        //EXTRA  SA(6):50, 51, 53, 58, 5A, 5B
         filter.CAN_FilterMode = CAN_FilterMode_IdMask;
-        filter.CAN_FilterIdHigh     = (uint16_t)(0x0000000D >> 13);
-        filter.CAN_FilterIdLow      = (uint16_t)(0x0000000D << 3) | 0x04;
-        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x0000001F >> 13);
-        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x0000001F << 3) | 0x04;
+        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000F4 >> 13);
+        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000F4 << 3) | 0x04;
+        filter.CAN_FilterIdHigh     = (uint16_t)(0x00000050 >> 13);
+        filter.CAN_FilterIdLow      = (uint16_t)(0x00000050 << 3) | 0x04;
         filter.CAN_FilterNumber = 6;
         CAN_FilterInit(&filter);
 
-        //88-8F
-        //NEEDED SA:88,89,8C
-        //EXTRA  SA:8A,8B,8D,8E,8F
+        //ALL    SA(8):80, 81, 84, 85, 88, 89, 8C, 8D
+        //NEEDED SA(4):85, 89, 89, 8C
+        //EXTRA  SA(4):80, 81, 84, 8D
         filter.CAN_FilterMode = CAN_FilterMode_IdMask;
-        filter.CAN_FilterIdHigh     = (uint16_t)(0x00000088 >> 13);
-        filter.CAN_FilterIdLow      = (uint16_t)(0x00000088 << 3) | 0x04;
-        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000F8 >> 13);
-        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000F8 << 3) | 0x04;
+        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000F2 >> 13);
+        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000F2 << 3) | 0x04;
+        filter.CAN_FilterIdHigh     = (uint16_t)(0x00000080 >> 13);
+        filter.CAN_FilterIdLow      = (uint16_t)(0x00000080 << 3) | 0x04;
         filter.CAN_FilterNumber = 7;
         CAN_FilterInit(&filter);
 
-        //CE,CF
-        //NEEDED SA:CE,CF
+        //ALL    SA(8):91, 93, 95, 97, 99, 9B, 9D, 9F
+        //NEEDED SA(2):95, 9B
+        //EXTRA  SA(6):
         filter.CAN_FilterMode = CAN_FilterMode_IdMask;
-        filter.CAN_FilterIdHigh     = (uint16_t)(0x000000CE >> 13);
-        filter.CAN_FilterIdLow      = (uint16_t)(0x000000CE << 3) | 0x04;
-        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000FE >> 13);
-        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000FE << 3) | 0x04;
+        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000F1 >> 13);
+        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000F1 << 3) | 0x04;
+        filter.CAN_FilterIdHigh     = (uint16_t)(0x00000091 >> 13);
+        filter.CAN_FilterIdLow      = (uint16_t)(0x00000091 << 3) | 0x04;
         filter.CAN_FilterNumber = 8;
         CAN_FilterInit(&filter);
 
-        //D0,D2
-        //NEEDED SA:D0,D2
+        //ALL    SA(8):8D, 9D, AD, BD, CD, DD, ED, FD
+        //NEEDED SA(2):AD, DD
+        //EXTRA  SA(4):(8D), (9D), BD, CD, ED, FD
         filter.CAN_FilterMode = CAN_FilterMode_IdMask;
-        filter.CAN_FilterIdHigh     = (uint16_t)(0x000000D0 >> 13);
-        filter.CAN_FilterIdLow      = (uint16_t)(0x000000D0 << 3) | 0x04;
-        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000FD >> 13);
-        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000FD << 3) | 0x04;
+        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x0000008F >> 13);
+        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x0000008F << 3) | 0x04;
+        filter.CAN_FilterIdHigh     = (uint16_t)(0x0000008D >> 13);
+        filter.CAN_FilterIdLow      = (uint16_t)(0x0000008D << 3) | 0x04;
         filter.CAN_FilterNumber = 9;
         CAN_FilterInit(&filter);
 
-        //E4,E5,F4,F5
-        //NEEDED SA:E5,F4
-        //EXTRA  SA:E4,F5
+        //ALL    SA(4):CE, CF, EE, EF
+        //NEEDED SA(3):CE, CF, EE
+        //EXTRA  SA(1):EF
         filter.CAN_FilterMode = CAN_FilterMode_IdMask;
-        filter.CAN_FilterIdHigh     = (uint16_t)(0x000000E4 >> 13);
-        filter.CAN_FilterIdLow      = (uint16_t)(0x000000E4 << 3) | 0x04;
+        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000DE >> 13);
+        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000DE << 3) | 0x04;
+        filter.CAN_FilterIdHigh     = (uint16_t)(0x000000CE >> 13);
+        filter.CAN_FilterIdLow      = (uint16_t)(0x000000CE << 3) | 0x04;
+        filter.CAN_FilterNumber = 10;
+        CAN_FilterInit(&filter);
+
+        //ALL    SA(2):D0, D2
+        //NEEDED SA(2):D0, D2
+        //EXTRA  SA(0):
+        filter.CAN_FilterMode = CAN_FilterMode_IdMask;
+        filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000FD >> 13);
+        filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000FD << 3) | 0x04;
+        filter.CAN_FilterIdHigh     = (uint16_t)(0x000000D0 >> 13);
+        filter.CAN_FilterIdLow      = (uint16_t)(0x000000D0 << 3) | 0x04;
+        filter.CAN_FilterNumber = 11;
+        CAN_FilterInit(&filter);
+
+        //ALL    SA(4):E4, E5, F4, F5
+        //NEEDED SA(2):E5, F4
+        //EXTRA  SA(2):E4, F5
+        filter.CAN_FilterMode = CAN_FilterMode_IdMask;
         filter.CAN_FilterMaskIdHigh = (uint16_t)(0x000000EE >> 13);
         filter.CAN_FilterMaskIdLow  = (uint16_t)(0x000000EE << 3) | 0x04;
-        filter.CAN_FilterNumber = 10;
+        filter.CAN_FilterIdHigh     = (uint16_t)(0x000000E4 >> 13);
+        filter.CAN_FilterIdLow      = (uint16_t)(0x000000E4 << 3) | 0x04;
+        filter.CAN_FilterNumber = 12;
         CAN_FilterInit(&filter);
 
     }
