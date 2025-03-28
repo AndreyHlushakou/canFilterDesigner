@@ -21,21 +21,21 @@ public final class SubsetGenerationParallel2 {
         long start = System.currentTimeMillis();
 
         ForkJoinPool pool = new ForkJoinPool(); // Пул потоков
-        List<List<Integer>> res = pool.invoke(new SubsetTask(original, 0, lenSubset, new ArrayList<>()));
+        List<List<Integer>> res = pool.invoke(new SubsetTask<>(original, 0, lenSubset, new ArrayList<>()));
         printf(res);
         long stop = System.currentTimeMillis();
         System.out.println("time: " + (stop - start));
 
-        // pool.shutdown(); // Можно явно закрыть пул, но ForkJoinPool закрывается сам.
+         pool.shutdown(); // Можно явно закрыть пул, но ForkJoinPool закрывается сам.
     }
 
-    static class SubsetTask extends RecursiveTask<List<List<Integer>>> {
-        private final List<Integer> original;
+    static class SubsetTask <T> extends RecursiveTask<List<List<T>>> {
+        private final List<T> original;
         private final int start;
         private final int lenSubset;
-        private final List<Integer> subset;
+        private final List<T> subset;
 
-        public SubsetTask(List<Integer> original, int start, int lenSubset, List<Integer> subset) {
+        public SubsetTask(List<T> original, int start, int lenSubset, List<T> subset) {
             this.original = original;
             this.start = start;
             this.lenSubset = lenSubset;
@@ -43,8 +43,8 @@ public final class SubsetGenerationParallel2 {
         }
 
         @Override
-        protected List<List<Integer>> compute() {
-            List<List<Integer>> res = new ArrayList<>();
+        protected List<List<T>> compute() {
+            List<List<T>> res = new ArrayList<>();
 
             // Добавляем текущее подмножество, если оно не пустое
             if (!subset.isEmpty()) {
@@ -57,18 +57,18 @@ public final class SubsetGenerationParallel2 {
             }
 
             // Перебираем оставшиеся элементы
-            List<SubsetTask> subTasks = new ArrayList<>();
+            List<SubsetTask<T>> subTasks = new ArrayList<>();
             for (int i = start; i < original.size(); i++) {
-                List<Integer> newSubset = new ArrayList<>(subset);
+                List<T> newSubset = new ArrayList<>(subset);
                 newSubset.add(original.get(i));
 
-                SubsetTask task = new SubsetTask(original, i + 1, lenSubset, newSubset);
+                SubsetTask<T> task = new SubsetTask<>(original, i + 1, lenSubset, newSubset);
                 task.fork(); // Запускаем подзадачу в отдельном потоке
                 subTasks.add(task);
             }
 
             // Собираем результаты всех потоков
-            for (SubsetTask task : subTasks) {
+            for (SubsetTask<T> task : subTasks) {
                 res.addAll(task.join());
             }
 
