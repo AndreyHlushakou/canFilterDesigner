@@ -23,7 +23,7 @@ public final class Utils {
     public static Set<FilterCanPair> filterCanPairs;
 
     //карта всех возможных фильтров (со списком значений удовлетворяющих этот фильтр) для диапазона 0x00-0xFF
-    public static Map<FilterCanPair, Set<Integer>> maps;
+    public static Map<FilterCanPair, Set<Integer>> mapAllFilterAndCanIds;
 
     //карта всех элементов и списком их фильтров с нужными и лишними значениями
     public static Map<Integer, Set<OneFilter>> mapSet;
@@ -86,7 +86,7 @@ public final class Utils {
 
 
 ////        finally2
-        maps = IntStream.rangeClosed(0x00, 0xFF)
+        mapAllFilterAndCanIds = IntStream.rangeClosed(0x00, 0xFF)
                 .boxed()
                 .flatMap((FilterMaskId) -> IntStream.rangeClosed(0x00, 0xFF)
                         .mapToObj((FilterId) -> new FilterCanPair(FilterMaskId, FilterId))
@@ -107,7 +107,7 @@ public final class Utils {
     }
 
     public static Map<FilterCanPair, Set<Integer>> filtersForCanArr(int[] canId_arr, int valueSize) {
-        return maps.entrySet().stream()
+        return mapAllFilterAndCanIds.entrySet().stream()
                 .filter(entry -> entry.getValue().size() > valueSize)
                 .filter(entry ->
                         entry.getValue().stream()
@@ -167,7 +167,8 @@ public final class Utils {
     //вывод всех значения для карты фильтров
     public static void soutMaps(Map<FilterCanPair, Set<Integer>> maps0) {
         maps0.forEach((key, value) -> {
-            System.out.println(key);
+            System.out.print(key);
+            System.out.print("canId:");
             value.stream().map(Utils::intToHex).forEach((i) -> System.out.print(i +" "));
             System.out.println();
         });
@@ -177,7 +178,7 @@ public final class Utils {
     public static void soutQuantitySizeMaps() {
         Map<Integer, Integer> map = new TreeMap<>();
         int count = 0;
-        for (Map.Entry<FilterCanPair, Set<Integer>> filterCanPairListEntry : maps.entrySet()) {
+        for (Map.Entry<FilterCanPair, Set<Integer>> filterCanPairListEntry : mapAllFilterAndCanIds.entrySet()) {
             int size = filterCanPairListEntry.getValue().size();
             count +=size;
             if (map.containsKey(size)) {
@@ -255,7 +256,7 @@ public final class Utils {
                         //canId
                         i -> i,
                         //Set<OneFilterAndExtra>
-                        i -> maps.entrySet().stream()
+                        i -> mapAllFilterAndCanIds.entrySet().stream()
                                 .filter(e -> e.getValue().stream()
                                         .anyMatch(v -> v.equals(i)))
                                 .map(e -> new OneFilter(

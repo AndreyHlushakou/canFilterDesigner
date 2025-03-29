@@ -10,8 +10,8 @@ public final class SubsetGenerationParallel2 {
     private SubsetGenerationParallel2() {}
 
     public static void main(String[] args) {
-        int lenSet = 5; // Длина множества
-        int lenSubset = 3; // Максимальная длина подмножеств
+        int lenSet = 29; // Длина множества
+        int lenSubset = 14; // Максимальная длина подмножеств
 
         List<Integer> original = new ArrayList<>(lenSet);
         for (int i = 1; i <= lenSet; i++) {
@@ -20,9 +20,18 @@ public final class SubsetGenerationParallel2 {
 
         long start = System.currentTimeMillis();
 
-        ForkJoinPool pool = new ForkJoinPool(); // Пул потоков
-        List<List<Integer>> res = pool.invoke(new SubsetTask<>(original, 0, lenSubset, new ArrayList<>()));
-        printf(res);
+        ForkJoinPool pool =
+                new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+//                ForkJoinPool.commonPool();
+//                new ForkJoinPool(); // Пул потоков
+
+//        SubsetTask<Integer> subsetTask = new SubsetTask<>(original, 0, lenSubset, new ArrayList<>());
+//        List<List<Integer>> res = pool.invoke(subsetTask);
+//        printf(res);
+
+        SubsetTask2<Integer> subsetTask = new SubsetTask2<>(original, 0, lenSubset, new ArrayList<>());
+        pool.invoke(subsetTask);
+
         long stop = System.currentTimeMillis();
         System.out.println("time: " + (stop - start));
 
@@ -73,6 +82,52 @@ public final class SubsetGenerationParallel2 {
             }
 
             return res;
+        }
+    }
+
+    static class SubsetTask2 <T> extends RecursiveTask<Boolean> {
+        private final List<T> original;
+        private final int start;
+        private final int lenSubset;
+        private final List<T> subset;
+
+        public SubsetTask2(List<T> original, int start, int lenSubset, List<T> subset) {
+            this.original = original;
+            this.start = start;
+            this.lenSubset = lenSubset;
+            this.subset = new ArrayList<>(subset); // Создаем копию, чтобы избежать конфликтов между потоками
+        }
+
+        @Override
+        protected Boolean compute() {
+
+            // Добавляем текущее подмножество, если оно не пустое
+            if (!subset.isEmpty()) {
+//                System.out.println(subset);
+            }
+
+            // Если достигли лимита длины, выходим
+            if (subset.size() == lenSubset) {
+                return true;
+            }
+
+            // Перебираем оставшиеся элементы
+            List<SubsetTask2<T>> subTasks = new ArrayList<>();
+            for (int i = start; i < original.size(); i++) {
+                List<T> newSubset = new ArrayList<>(subset);
+                newSubset.add(original.get(i));
+
+                SubsetTask2<T> task = new SubsetTask2<>(original, i + 1, lenSubset, newSubset);
+                task.fork(); // Запускаем подзадачу в отдельном потоке
+                subTasks.add(task);
+            }
+
+            // Собираем результаты всех потоков
+            for (SubsetTask2<T> task : subTasks) {
+                task.join();
+            }
+
+            return true;
         }
     }
 

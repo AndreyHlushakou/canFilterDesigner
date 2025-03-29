@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.example.Utils.maps;
+import static org.example.Utils.mapAllFilterAndCanIds;
 
 public class CombinationCanIdAndFilters {
     private final Set<Integer> canIds;
@@ -14,7 +14,7 @@ public class CombinationCanIdAndFilters {
     public CombinationCanIdAndFilters(Set<Integer> canIds) {
         this.canIds = canIds;
 
-        mapsFilters = maps.entrySet()
+        mapsFilters = mapAllFilterAndCanIds.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().containsAll(canIds))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
