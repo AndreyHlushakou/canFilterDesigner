@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 public class PairCanId {
+//    private Set<Integer> defaultSa;
     private Set<Integer> neededSa;
     private Set<Integer> extraSa;
 
@@ -21,28 +22,33 @@ public class PairCanId {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PairCanId pairCanId = (PairCanId) o;
-        return Objects.equals(extraSa, pairCanId.extraSa) && Objects.equals(neededSa, pairCanId.neededSa);
+        return Objects.equals(neededSa, pairCanId.neededSa) && Objects.equals(extraSa, pairCanId.extraSa);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(extraSa, neededSa);
+        return Objects.hash(neededSa, extraSa);
     }
 
     @Override
     public String toString() {
         return "PairCanId{" +
+//                "\ndefaultSa=" +
+//                defaultSa.stream()
+//                        .map(v -> String.format("0x%02X", v))
+//                        .sorted()
+//                        .collect(Collectors.toCollection(LinkedHashSet::new)) +
                 "\nneededSa=" +
                 neededSa.stream()
                         .map(v -> String.format("0x%02X", v))
                         .sorted()
                         .collect(Collectors.toCollection(LinkedHashSet::new)) +
-                "\nextraSa=" +
+                "\n extraSa=" +
                 extraSa.stream()
                         .map(v -> String.format("0x%02X", v))
                         .sorted()
                         .collect(Collectors.toCollection(LinkedHashSet::new)) +
-                '}';
+                "}\n";
     }
 
     public static Comparator<PairCanId> comparatorPairCanId = new ComparatorByExtra().thenComparing(new ComparatorByNeeded().reversed());
