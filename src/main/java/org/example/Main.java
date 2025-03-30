@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.example.Utils.*;
+import static org.example.entity.PairCanId.comparatorPairCanId;
 
 public class Main {
 
@@ -96,6 +97,20 @@ public class Main {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 //        System.out.println(mapFilterAndPairCanIdFiltered);
         System.out.println("mapFilterAndPairCanIdFiltered.size=" + mapFilterAndPairCanIdFiltered.size());
+
+        final String[] strBuff = {""};
+//        mapFilterAndPairCanId
+                mapFilterAndPairCanIdFiltered
+                .values().stream()
+                .sorted(comparatorPairCanId)
+                .forEach(e -> {
+                    String str = "N.L:" + e.getNeededSa().size() + " --- " + "E.L:" + e.getExtraSa().size();
+                    if (!strBuff[0].equals(str)) {
+                        System.out.println(str);
+                        strBuff[0] = str;
+                    }
+                });
+        System.exit(0);
 
 //        mapFilterAndPairCanIdFiltered.entrySet().stream()
 //                .sorted(Map.Entry.comparingByValue(comparatorPairCanId))
