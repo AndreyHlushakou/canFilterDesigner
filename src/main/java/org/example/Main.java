@@ -77,7 +77,7 @@ public class Main {
                     if (value.getNeededSa().size() != 1) return true;
                     else return value.getExtraSa().isEmpty();
                 })
-                .filter(e -> e.getValue().getExtraSa().size() <= e.getValue().getNeededSa().size()*3)
+//                .filter(e -> e.getValue().getExtraSa().size() <= e.getValue().getNeededSa().size()*3)
 //                .filter(e -> e.getValue().getNeededSa().size() == 2)
 //                .sorted((e1, e2) -> )
 //                .collect(Collectors.toMap(
