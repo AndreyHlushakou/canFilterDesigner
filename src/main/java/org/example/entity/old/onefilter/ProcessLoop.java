@@ -1,4 +1,7 @@
-package org.example.entity;
+package org.example.entity.old.onefilter;
+
+import org.example.entity.FilterCanPair;
+import org.example.entity.old.SetFilter;
 
 import java.util.Arrays;
 import java.util.HashSet;

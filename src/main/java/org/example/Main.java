@@ -11,7 +11,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static org.example.Utils.*;
+import static org.example.Utils.soutAllCanIdByFilter;
+import static org.example.UtilsFilterCanPair.*;
 import static org.example.entity.PairCanId.comparatorPairCanId;
 
 public class Main {
@@ -45,25 +46,21 @@ public class Main {
 //        int FilterId     = 0x00;
 //        int FilterMaskId = 0b1110_1110;
 //        int FilterId     = 0b1110_0100;
-//        checkCanId(FilterMaskId, FilterId);
+//        soutAllCanIdByFilter(FilterMaskId, FilterId);
 
         /////////////////////////////////////////////////////////
-//        soutMaps(maps);
+//        soutMaps(mapAllFilterAndCanIds);
 //        soutQuantitySizeMaps();
 
         /////////////////////////////////////////////////////////
-//        System.out.println("canId_arr.length=" + canId_arr.length);
-//        System.out.println("filtersForCanArr.size=" + maps.size());
+//        System.out.println("canId_arr.length=" + CAN_ID_ARR.length);
+//        System.out.println("filtersForCanArr.size=" + mapAllFilterAndCanIds.size());
 
         /////////////////////////////////////////////////////////
-//        Map<FilterCanPair, Set<Integer>> filtersForCanArr = filtersForCanArr(canId_arr, 0);
-//        soutSortedMapsBySize(filtersForCanArr);
-//        soutMapsBySize(filtersForCanArr);
+//        soutSortedMapsBySize(0);
 
         /////////////////////////////////////////////////////////
-//        createMapSet(canId_arr);
-
-        process();
+//        process();
     }
 
     public static void process() {

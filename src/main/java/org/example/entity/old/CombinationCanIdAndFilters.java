@@ -1,11 +1,13 @@
-package org.example.entity;
+package org.example.entity.old;
+
+import org.example.entity.FilterCanPair;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.example.Utils.mapAllFilterAndCanIds;
+import static org.example.UtilsFilterCanPair.mapAllFilterAndCanIds;
 
 public class CombinationCanIdAndFilters {
     private final Set<Integer> canIds;

@@ -1,7 +1,8 @@
-package org.example.entity;
+package org.example.entity.old;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.example.entity.FilterCanPair;
 
 import java.util.Objects;
 import java.util.Set;

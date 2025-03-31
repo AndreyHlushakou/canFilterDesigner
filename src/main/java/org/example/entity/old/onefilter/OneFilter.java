@@ -1,7 +1,8 @@
-package org.example.entity;
+package org.example.entity.old.onefilter;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.example.entity.FilterCanPair;
 
 import java.util.Comparator;
 import java.util.Objects;
