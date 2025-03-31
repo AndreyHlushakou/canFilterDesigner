@@ -60,21 +60,17 @@ public class SubsetGeneration2UsingBit {
     static <T> void subsetsWithoutRes(List<T> arr) {
         int n = arr.size();
 
-        // Loop through all possible
-        // subsets using bit manipulation
+        // Loop through all possible subsets using bit manipulation
         for (int i = 0; i < (1 << n); i++) {
             List<T> subset = new ArrayList<>();
 
-            // Loop through all elements
-            // of the input array
+            // Loop through all elements of the input array
             for (int j = 0; j < n; j++) {
 
-                // Check if the jth bit is
-                // set in the current subset
+                // Check if the jth bit is set in the current subset
                 if ((i & (1 << j)) != 0) {
 
-                    // If the jth bit is set, add
-                    // the jth element to the subset
+                    // If the jth bit is set, add the jth element to the subset
                     subset.add(arr.get(j));
                 }
             }
