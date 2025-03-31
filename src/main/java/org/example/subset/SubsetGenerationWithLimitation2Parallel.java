@@ -3,6 +3,7 @@ package org.example.subset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
 
 public final class SubsetGenerationWithLimitation2Parallel {
@@ -26,7 +27,7 @@ public final class SubsetGenerationWithLimitation2Parallel {
 
 //        SubsetTask<Integer> subsetTask = new SubsetTask<>(original, 0, lenSubset, new ArrayList<>());
         SubsetTaskWithoutRes<Integer> subsetTask = new SubsetTaskWithoutRes<>(original, 0, lenSubset, new ArrayList<>());
-
+//        SubsetTaskWithLimitationThreads subsetTask= new SubsetTaskWithLimitationThreads(original, 0, lenSubset, new ArrayList<>(), 0);
         long start = System.currentTimeMillis();
 //        List<List<Integer>> res = pool.invoke(subsetTask);
         pool.invoke(subsetTask);
@@ -84,7 +85,7 @@ public final class SubsetGenerationWithLimitation2Parallel {
         }
     }
 
-    static class SubsetTaskWithoutRes<T> extends RecursiveTask<Boolean> {
+    static class SubsetTaskWithoutRes<T> extends RecursiveAction {
         private final List<T> original;
         private final int start;
         private final int lenSubset;
@@ -98,7 +99,7 @@ public final class SubsetGenerationWithLimitation2Parallel {
         }
 
         @Override
-        protected Boolean compute() {
+        protected void compute() {
 
             // Добавляем текущее подмножество, если оно не пустое
             if (!subset.isEmpty()) {
@@ -107,7 +108,7 @@ public final class SubsetGenerationWithLimitation2Parallel {
 
             // Если достигли лимита длины, выходим
             if (subset.size() == lenSubset) {
-                return true;
+                return;
             }
 
             // Перебираем оставшиеся элементы
@@ -126,7 +127,55 @@ public final class SubsetGenerationWithLimitation2Parallel {
                 task.join();
             }
 
-            return true;
+        }
+    }
+
+    private static final int PARALLEL_DEPTH = 3;
+
+    static class SubsetTaskWithLimitationThreads extends RecursiveAction {
+        private final List<Integer> original;
+        private final int start;
+        private final int lenSubset;
+        private final List<Integer> subset;
+        private final int depth; // Глубина рекурсии
+
+        public SubsetTaskWithLimitationThreads(List<Integer> original, int start, int lenSubset, List<Integer> subset, int depth) {
+            this.original = original;
+            this.start = start;
+            this.lenSubset = lenSubset;
+            this.subset = new ArrayList<>(subset);
+            this.depth = depth;
+        }
+
+        @Override
+        protected void compute() {
+            if (!subset.isEmpty()) {
+                // System.out.println(subset); // Можно раскомментировать для проверки
+            }
+
+            if (subset.size() == lenSubset) {
+                return;
+            }
+
+            List<SubsetTaskWithLimitationThreads> subTasks = new ArrayList<>();
+            for (int i = start; i < original.size(); i++) {
+                List<Integer> newSubset = new ArrayList<>(subset);
+                newSubset.add(original.get(i));
+
+                if (depth < PARALLEL_DEPTH) {
+                    // Параллелим только первые уровни рекурсии
+                    SubsetTaskWithLimitationThreads task = new SubsetTaskWithLimitationThreads(original, i + 1, lenSubset, newSubset, depth + 1);
+                    subTasks.add(task);
+                    task.fork();
+                } else {
+                    // После определенной глубины работаем в однопоточном режиме
+                    new SubsetTaskWithLimitationThreads(original, i + 1, lenSubset, newSubset, depth + 1).compute();
+                }
+            }
+
+            for (SubsetTaskWithLimitationThreads task : subTasks) {
+                task.join();
+            }
         }
     }
 
