@@ -18,7 +18,7 @@ public class UtilsFilterCanPair {
     public static Set<FilterCanPair> filterCanPairs;
 
     //карта всех возможных фильтров (со списком значений удовлетворяющих этот фильтр) для диапазона 0x00-0xFF
-    public static Map<FilterCanPair, Set<Integer>> mapAllFilterAndCanIds;
+    public static Map<FilterCanPair, Set<Integer>> totalMapFilters;
 
     static {
         //для понимания как создается mapAllFilterAndCanIds
@@ -78,7 +78,7 @@ public class UtilsFilterCanPair {
 
 
 ////        finally2
-        mapAllFilterAndCanIds = IntStream.rangeClosed(0x00, 0xFF)
+        totalMapFilters = IntStream.rangeClosed(0x00, 0xFF)
                 .boxed()
                 .flatMap((FilterMaskId) -> IntStream.rangeClosed(0x00, 0xFF)
                         .mapToObj((FilterId) -> new FilterCanPair(FilterMaskId, FilterId))
@@ -112,7 +112,7 @@ public class UtilsFilterCanPair {
     public static void soutQuantitySizeMaps() {
         Map<Integer, Integer> map = new TreeMap<>();
         int count = 0;
-        for (Map.Entry<FilterCanPair, Set<Integer>> filterCanPairListEntry : mapAllFilterAndCanIds.entrySet()) {
+        for (Map.Entry<FilterCanPair, Set<Integer>> filterCanPairListEntry : totalMapFilters.entrySet()) {
             int size = filterCanPairListEntry.getValue().size();
             count +=size;
             if (map.containsKey(size)) {
@@ -126,11 +126,11 @@ public class UtilsFilterCanPair {
     }
 
     public static void soutSortedMapsBySize(int typeSort) {
-        soutSortedMapsBySize(mapAllFilterAndCanIds, typeSort);
+        soutSortedMapsBySize(totalMapFilters, typeSort);
     }
 
-    private static final Comparator<Map.Entry<FilterCanPair, Set<Integer>>> ASC = Comparator.comparingInt(e -> e.getValue().size());
-    private static final Comparator<Map.Entry<FilterCanPair, Set<Integer>>> DESC = (e1, e2) -> Integer.compare(e2.getValue().size(), e1.getValue().size());
+    public static final Comparator<Map.Entry<FilterCanPair, Set<Integer>>> ASC = Comparator.comparingInt(e -> e.getValue().size());
+    public static final Comparator<Map.Entry<FilterCanPair, Set<Integer>>> DESC = (e1, e2) -> Integer.compare(e2.getValue().size(), e1.getValue().size());
 
     public static void soutSortedMapsBySize(Map<FilterCanPair, Set<Integer>> filtersForCanArr, int typeSort) {
         Comparator<Map.Entry<FilterCanPair, Set<Integer>>> comparator = typeSort == 0 ? ASC : DESC;
@@ -146,15 +146,15 @@ public class UtilsFilterCanPair {
         soutMaps(filtersForCanArrSorted);
     }
 
-    public static Map<FilterCanPair, Set<Integer>> createMapFilterAndCanIdsByCAN_ID_LIST(List<Integer> CAN_ID_LIST) {
-        return mapAllFilterAndCanIds.entrySet().stream()
+    public static Map<FilterCanPair, Set<Integer>> createMapFilterAndCanIdsByCAN_ID_LIST(Collection<Integer> CAN_ID_LIST) {
+        return totalMapFilters.entrySet().stream()
                 .filter(e -> e.getValue().stream()
                         .anyMatch(v -> CAN_ID_LIST.stream()
                                 .anyMatch(c -> c.equals(v))))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public static Map<FilterCanPair, PairCanId> createMapFilterAndPairCanId(Map<FilterCanPair, Set<Integer>> mapFilterAndCanIdsByCAN_ID_LIST, List<Integer> CAN_ID_LIST) {
+    public static Map<FilterCanPair, PairCanId> createMapFilterAndPairCanId(Map<FilterCanPair, Set<Integer>> mapFilterAndCanIdsByCAN_ID_LIST, Collection<Integer> CAN_ID_LIST) {
         return mapFilterAndCanIdsByCAN_ID_LIST.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,

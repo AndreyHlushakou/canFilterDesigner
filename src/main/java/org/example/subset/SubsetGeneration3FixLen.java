@@ -5,9 +5,9 @@ import java.util.List;
 
 import static org.example.subset.UtilsSubset.*;
 
-public class SubsetGeneration3Backtracking {
+public class SubsetGeneration3FixLen {
 
-    private SubsetGeneration3Backtracking() {}
+    private SubsetGeneration3FixLen() {}
 
     public static void main(String[] args) {
         System.out.println("SubsetGeneration3Backtracking");

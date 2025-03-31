@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static org.example.UtilsFilterCanPair.mapAllFilterAndCanIds;
+import static org.example.UtilsFilterCanPair.totalMapFilters;
 import static org.example.entity.old.onefilter.OneFilter.comparatorOneFilter;
 
 public class UtilsOneFilter {
@@ -48,7 +48,7 @@ public class UtilsOneFilter {
                         //canId
                         i -> i,
                         //Set<OneFilterAndExtra>
-                        i -> mapAllFilterAndCanIds.entrySet().stream()
+                        i -> totalMapFilters.entrySet().stream()
                                 .filter(e -> e.getValue().stream()
                                         .anyMatch(v -> v.equals(i)))
                                 .map(e -> new OneFilter(
