@@ -8,7 +8,8 @@ public final class SubsetGeneration {
     private SubsetGeneration() {}
 
     public static void main(String[] args) {
-        int lenSet = 25;
+        System.out.println("SubsetGeneration");
+        int lenSet = 30;
 
 
         List<Integer> original = new ArrayList<>(lenSet);
@@ -17,7 +18,8 @@ public final class SubsetGeneration {
         }
 
         long start = System.currentTimeMillis();
-        List<List<Integer>> res = subsets(original);
+//        List<List<Integer>> res = subsets(original);
+        subsetsWithoutRes(original);
         long stop = System.currentTimeMillis();
 //        printf(res);
         System.out.println("time: " + (stop - start));
@@ -28,6 +30,11 @@ public final class SubsetGeneration {
         List<List<T>> res = new ArrayList<>(1<<original.size());
         subsetRecur(0, original, res, subset);
         return res;
+    }
+
+    static <T> void subsetsWithoutRes(List<T> original) {
+        List<T> subset = new ArrayList<>();
+        subsetRecurWithoutRes(0, original, subset);
     }
 
     static <T> void subsetRecur(int i, List<T> original, List<List<T>> res, List<T> subset) {
@@ -45,6 +52,23 @@ public final class SubsetGeneration {
         // exclude the current value and recursively find all subsets
         subset.remove(subset.size() - 1);
         subsetRecur(i + 1, original, res, subset);
+    }
+
+    static <T> void subsetRecurWithoutRes(int i, List<T> original, List<T> subset) {
+
+        // add subset at end of array
+        if (i == original.size()) {
+//            res.add(new ArrayList<>(subset));
+            return;
+        }
+
+        // include the current value and recursively find all subsets
+        subset.add(original.get(i));
+        subsetRecurWithoutRes(i + 1, original, subset);
+
+        // exclude the current value and recursively find all subsets
+        subset.remove(subset.size() - 1);
+        subsetRecurWithoutRes(i + 1, original, subset);
     }
 
     static <T> void printf(List<List<T>> res) {

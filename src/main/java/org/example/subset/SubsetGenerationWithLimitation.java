@@ -3,12 +3,13 @@ package org.example.subset;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class SubsetGeneration2 {
+public final class SubsetGenerationWithLimitation {
 
-    private SubsetGeneration2() {}
+    private SubsetGenerationWithLimitation() {}
 
     public static void main(String[] args) {
-        int lenSet = 32; // Длина множества
+        System.out.println("SubsetGenerationWithLimitation");
+        int lenSet = 30; // Длина множества
         int lenSubset = 14; // Максимальная длина подмножеств
 
         List<Integer> original = new ArrayList<>(lenSet);
@@ -21,7 +22,6 @@ public final class SubsetGeneration2 {
         subsetsWithoutRes(original, lenSubset);
         long stop = System.currentTimeMillis();
 //        printf(res);
-
         System.out.println("time: " + (stop - start));
     }
 

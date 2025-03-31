@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
-public final class SubsetGenerationParallel2 {
+public final class SubsetGenerationWithLimitation2Parallel {
 
-    private SubsetGenerationParallel2() {}
+    private SubsetGenerationWithLimitation2Parallel() {}
 
     public static void main(String[] args) {
-        int lenSet = 29; // Длина множества
+        System.out.println("SubsetGenerationWithLimitation");
+        int lenSet = 30; // Длина множества
         int lenSubset = 14; // Максимальная длина подмножеств
 
         List<Integer> original = new ArrayList<>(lenSet);
@@ -18,21 +19,19 @@ public final class SubsetGenerationParallel2 {
             original.add(i);
         }
 
-        long start = System.currentTimeMillis();
-
         ForkJoinPool pool =
-                new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+//                new ForkJoinPool(Runtime.getRuntime().availableProcessors());
 //                ForkJoinPool.commonPool();
-//                new ForkJoinPool(); // Пул потоков
+                new ForkJoinPool(); // Пул потоков
 
 //        SubsetTask<Integer> subsetTask = new SubsetTask<>(original, 0, lenSubset, new ArrayList<>());
+        SubsetTaskWithoutRes<Integer> subsetTask = new SubsetTaskWithoutRes<>(original, 0, lenSubset, new ArrayList<>());
+
+        long start = System.currentTimeMillis();
 //        List<List<Integer>> res = pool.invoke(subsetTask);
-//        printf(res);
-
-        SubsetTask2<Integer> subsetTask = new SubsetTask2<>(original, 0, lenSubset, new ArrayList<>());
         pool.invoke(subsetTask);
-
         long stop = System.currentTimeMillis();
+//        printf(res);
         System.out.println("time: " + (stop - start));
 
          pool.shutdown(); // Можно явно закрыть пул, но ForkJoinPool закрывается сам.
@@ -85,13 +84,13 @@ public final class SubsetGenerationParallel2 {
         }
     }
 
-    static class SubsetTask2 <T> extends RecursiveTask<Boolean> {
+    static class SubsetTaskWithoutRes<T> extends RecursiveTask<Boolean> {
         private final List<T> original;
         private final int start;
         private final int lenSubset;
         private final List<T> subset;
 
-        public SubsetTask2(List<T> original, int start, int lenSubset, List<T> subset) {
+        public SubsetTaskWithoutRes(List<T> original, int start, int lenSubset, List<T> subset) {
             this.original = original;
             this.start = start;
             this.lenSubset = lenSubset;
@@ -112,18 +111,18 @@ public final class SubsetGenerationParallel2 {
             }
 
             // Перебираем оставшиеся элементы
-            List<SubsetTask2<T>> subTasks = new ArrayList<>();
+            List<SubsetTaskWithoutRes<T>> subTasks = new ArrayList<>();
             for (int i = start; i < original.size(); i++) {
                 List<T> newSubset = new ArrayList<>(subset);
                 newSubset.add(original.get(i));
 
-                SubsetTask2<T> task = new SubsetTask2<>(original, i + 1, lenSubset, newSubset);
+                SubsetTaskWithoutRes<T> task = new SubsetTaskWithoutRes<>(original, i + 1, lenSubset, newSubset);
                 task.fork(); // Запускаем подзадачу в отдельном потоке
                 subTasks.add(task);
             }
 
             // Собираем результаты всех потоков
-            for (SubsetTask2<T> task : subTasks) {
+            for (SubsetTaskWithoutRes<T> task : subTasks) {
                 task.join();
             }
 
