@@ -3,30 +3,24 @@ package org.example.subset;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.example.subset.UtilsSubset.*;
+
 public class SubsetGeneration2UsingBit {
 
     private SubsetGeneration2UsingBit() {}
 
     public static void main(String[] args) {
-        System.out.println("SubsetGenerationWithLimitation");
-        int lenSet = 27; // Длина множества
+        System.out.println("SubsetGeneration2UsingBit");
+        int lenSet = 10; // Длина множества
 
 
-        List<Integer> original = new ArrayList<>(lenSet);
-        for (int i = 1; i <= lenSet; i++) {
-            original.add(i);
-        }
-
-        long start = System.currentTimeMillis();
-//        List<List<Integer>> res = subsets(original);
-        subsetsWithoutRes(original);
-        long stop = System.currentTimeMillis();
-//        printf(res);
-        System.out.println("time: " + (stop - start));
+        List<Integer> original = getListByLen(lenSet);
+//        calculationTimeAndPrintfResult(() -> subsets(original));
+        calculationTime.accept(() -> subsetsWithoutRes(original));
     }
 
     // Function to find the subsets of the given array
-    static <T> List<List<T>> subsetsWithRes(List<T> arr) {
+    static <T> List<List<T>> subsets(List<T> arr) {
         int n = arr.size();
         List<List<T>> res = new ArrayList<>();
 
@@ -79,16 +73,6 @@ public class SubsetGeneration2UsingBit {
 //            res.add(subset);
         }
 
-
-    }
-
-    static <T> void printf(List<List<T>> res) {
-        for (List<T> subset : res) {
-            for (T num : subset) {
-                System.out.print(num + " ");
-            }
-            System.out.println();
-        }
     }
 
 }

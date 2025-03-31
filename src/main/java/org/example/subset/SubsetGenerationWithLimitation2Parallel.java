@@ -6,6 +6,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
 
+import static org.example.subset.UtilsSubset.*;
+
 public final class SubsetGenerationWithLimitation2Parallel {
 
     private SubsetGenerationWithLimitation2Parallel() {}
@@ -15,25 +17,21 @@ public final class SubsetGenerationWithLimitation2Parallel {
         int lenSet = 30; // Длина множества
         int lenSubset = 14; // Максимальная длина подмножеств
 
-        List<Integer> original = new ArrayList<>(lenSet);
-        for (int i = 1; i <= lenSet; i++) {
-            original.add(i);
-        }
+        List<Integer> original = getListByLen(lenSet);
 
         ForkJoinPool pool =
 //                new ForkJoinPool(Runtime.getRuntime().availableProcessors());
 //                ForkJoinPool.commonPool();
                 new ForkJoinPool(); // Пул потоков
 
-//        SubsetTask<Integer> subsetTask = new SubsetTask<>(original, 0, lenSubset, new ArrayList<>());
-        SubsetTaskWithoutRes<Integer> subsetTask = new SubsetTaskWithoutRes<>(original, 0, lenSubset, new ArrayList<>());
-//        SubsetTaskWithLimitationThreads subsetTask= new SubsetTaskWithLimitationThreads(original, 0, lenSubset, new ArrayList<>(), 0);
-        long start = System.currentTimeMillis();
-//        List<List<Integer>> res = pool.invoke(subsetTask);
-        pool.invoke(subsetTask);
-        long stop = System.currentTimeMillis();
-//        printf(res);
-        System.out.println("time: " + (stop - start));
+//        SubsetTask<Integer> subsetTask1 = new SubsetTask<>(original, 0, lenSubset, new ArrayList<>());
+//        calculationTimeAndPrintfResult(() ->  pool.invoke(subsetTask1));
+
+        SubsetTaskWithoutRes<Integer> subsetTask2 = new SubsetTaskWithoutRes<>(original, 0, lenSubset, new ArrayList<>());
+        calculationTime.accept(() -> pool.invoke(subsetTask2));
+
+//        SubsetTaskWithLimitationThreads subsetTask3= new SubsetTaskWithLimitationThreads(original, 0, lenSubset, new ArrayList<>(), 0);
+//        calculationTime.accept(() -> pool.invoke(subsetTask3));
 
          pool.shutdown(); // Можно явно закрыть пул, но ForkJoinPool закрывается сам.
     }
@@ -179,13 +177,5 @@ public final class SubsetGenerationWithLimitation2Parallel {
         }
     }
 
-    static <T> void printf(List<List<T>> res) {
-        for (List<T> subset : res) {
-            for (T num : subset) {
-                System.out.print(num + " ");
-            }
-            System.out.println();
-        }
-    }
 }
 

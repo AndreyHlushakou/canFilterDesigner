@@ -4,8 +4,6 @@ import org.example.entity.FilterCanPair;
 import org.example.entity.PairCanId;
 
 import java.util.*;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -13,7 +11,6 @@ import java.util.stream.Collectors;
 
 import static org.example.Utils.soutAllCanIdByFilter;
 import static org.example.UtilsFilterCanPair.*;
-import static org.example.entity.PairCanId.comparatorPairCanId;
 
 public class Main {
 
@@ -41,25 +38,25 @@ public class Main {
     public static final List<Integer> CAN_ID_LIST = Arrays.stream(CAN_ID_ARR).boxed().sorted().toList();
 
     public static void main(String[] args) {
-
+//
 //        int FilterMaskId = 0xC8;
 //        int FilterId     = 0x00;
 //        int FilterMaskId = 0b1110_1110;
 //        int FilterId     = 0b1110_0100;
 //        soutAllCanIdByFilter(FilterMaskId, FilterId);
-
-        /////////////////////////////////////////////////////////
+//
+//        /////////////////////////////////////////////////////////
 //        soutMaps(mapAllFilterAndCanIds);
 //        soutQuantitySizeMaps();
-
-        /////////////////////////////////////////////////////////
+//
+//        /////////////////////////////////////////////////////////
 //        System.out.println("canId_arr.length=" + CAN_ID_ARR.length);
 //        System.out.println("filtersForCanArr.size=" + mapAllFilterAndCanIds.size());
-
-        /////////////////////////////////////////////////////////
+//
+//        /////////////////////////////////////////////////////////
 //        soutSortedMapsBySize(0);
-
-        /////////////////////////////////////////////////////////
+//
+//        /////////////////////////////////////////////////////////
         process();
     }
 
@@ -67,7 +64,7 @@ public class Main {
         System.out.println("maps.size=" + mapAllFilterAndCanIds.size());
         Map<FilterCanPair, Set<Integer>> mapFilterAndCanIdsByCAN_ID_LIST = createMapFilterAndCanIdsByCAN_ID_LIST(CAN_ID_LIST);
 //        soutMaps(mapFilterAndCanIdsByCAN_ID_LIST);
-//        System.out.println("mapFilterAndCanIdsByCAN_ID_LIST.size=" + mapFilterAndCanIdsByCAN_ID_LIST.size());
+        System.out.println("mapFilterAndCanIdsByCAN_ID_LIST.size=" + mapFilterAndCanIdsByCAN_ID_LIST.size());
 
         Map<FilterCanPair, PairCanId> mapFilterAndPairCanId = createMapFilterAndPairCanId(mapFilterAndCanIdsByCAN_ID_LIST, CAN_ID_LIST);
 //        System.out.println(mapFilterAndPairCanId);
@@ -84,9 +81,12 @@ public class Main {
 //        soutMapFilterAndPairCanIdFilteredByQuantity(mapFilterAndPairCanIdFiltered);
 //        soutMapFilterAndPairCanIdFilteredByQuantity2(mapFilterAndPairCanIdFiltered);
 
+//        process2(mapFilterAndPairCanIdFiltered);
+    }
+
+    public static void process2(Map<FilterCanPair, PairCanId> mapFilterAndPairCanIdFiltered) {
         List<Map.Entry<FilterCanPair, PairCanId>> original = mapFilterAndPairCanIdFiltered.entrySet().stream().toList();
 //        System.out.println("original.size=" + original.size());
-        System.exit(0);
 
         AtomicInteger minCountExtra = new AtomicInteger(Integer.MAX_VALUE);
         AtomicReference<List<Map.Entry<FilterCanPair, PairCanId>>> minCountExtraSetFilters = new AtomicReference<>(null);
@@ -118,12 +118,8 @@ public class Main {
             }
         };
 
-        ForkJoinPool pool = new ForkJoinPool(); // Пул потоков
-        SubsetTask2<Map.Entry<FilterCanPair, PairCanId>> subsetTask = new SubsetTask2<>(original, 0, 14, new ArrayList<>(), consumerOriginal);
-
         long start = System.currentTimeMillis();
-        pool.invoke(subsetTask);
-//        subsetsWithoutRes(original, 14, consumerOriginal);
+        subsetsWithoutRes(original, consumerOriginal);
         long stop = System.currentTimeMillis();
         System.out.println("time=" + (stop - start)/1000 + " s");
 
@@ -134,79 +130,30 @@ public class Main {
         System.out.println(minCountFiltersSetFilters);
     }
 
-    static <T> void subsetsWithoutRes(List<T> original, int lenSubset, Consumer<List<T>> consumerOriginal) {
-        List<T> subset = new ArrayList<>(lenSubset);
-        subsetRecurWithoutRes(0, original, subset, lenSubset, consumerOriginal);
+    static <T> void subsetsWithoutRes(List<T> original, Consumer<List<T>> consumerOriginal) {
+        List<T> subset = new ArrayList<>(14);
+        subsetRecurWithoutRes(0, original, subset, consumerOriginal);
     }
 
-    static <T> void subsetRecurWithoutRes(int i, List<T> original, List<T> subset, int lenSubset, Consumer<List<T>> consumerOriginal) {
+    static <T> void subsetRecurWithoutRes(int i, List<T> original, List<T> subset, Consumer<List<T>> consumerOriginal) {
 
         // Добавляем подмножество, если оно не пустое
         if (!subset.isEmpty()) {
-//            System.out.println(subset);
+//            System.out.println(subset.size());
             consumerOriginal.accept(subset);
         }
 
         // Если уже достигли максимальной длины, возвращаемся
-        if (subset.size() == lenSubset) {
+        if (subset.size() == 14) {
             return;
         }
 
         // Перебираем оставшиеся элементы
         for (int j = i; j < original.size(); j++) {
             subset.add(original.get(j));
-            subsetRecurWithoutRes(j + 1, original, subset, lenSubset, consumerOriginal);
+            subsetRecurWithoutRes(j + 1, original, subset, consumerOriginal);
             subset.remove(subset.size() - 1); // Убираем последний элемент (backtracking)
         }
     }
-
-    static class SubsetTask2 <T> extends RecursiveTask<Boolean> {
-        private final List<T> original;
-        private final int start;
-        private final int lenSubset;
-        private final List<T> subset;
-        private final Consumer<List<T>> consumerOriginal;
-
-        public SubsetTask2(List<T> original, int start, int lenSubset, List<T> subset, Consumer<List<T>> consumerOriginal) {
-            this.original = original;
-            this.start = start;
-            this.lenSubset = lenSubset;
-            this.subset = new ArrayList<>(subset); // Создаем копию, чтобы избежать конфликтов между потоками
-            this.consumerOriginal = consumerOriginal;
-        }
-
-        @Override
-        protected Boolean compute() {
-
-            // Добавляем текущее подмножество, если оно не пустое
-            if (!subset.isEmpty()) {
-                consumerOriginal.accept(subset);
-            }
-
-            // Если достигли лимита длины, выходим
-            if (subset.size() == lenSubset) {
-                return true;
-            }
-
-            // Перебираем оставшиеся элементы
-            List<SubsetTask2<T>> subTasks = new ArrayList<>();
-            for (int i = start; i < original.size(); i++) {
-                List<T> newSubset = new ArrayList<>(subset);
-                newSubset.add(original.get(i));
-
-                SubsetTask2<T> task = new SubsetTask2<>(original, i + 1, lenSubset, newSubset, consumerOriginal);
-                task.fork(); // Запускаем подзадачу в отдельном потоке
-                subTasks.add(task);
-            }
-
-            // Собираем результаты всех потоков
-            for (SubsetTask2<T> task : subTasks) {
-                task.join();
-            }
-
-            return true;
-        }
-    }
-
 
 }

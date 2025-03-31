@@ -1,8 +1,9 @@
 package org.example.subset;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.example.subset.UtilsSubset.*;
 
 public class SubsetGeneration2UsingBitWithLimitation {
 
@@ -12,16 +13,8 @@ public class SubsetGeneration2UsingBitWithLimitation {
         int lenSet = 27; // Длина множества
         int lenSubset = 14; // Максимальная длина подмножеств
 
-        List<Integer> original = new ArrayList<>(lenSet);
-        for (int i = 1; i <= lenSet; i++) {
-            original.add(i);
-        }
-
-        long start = System.currentTimeMillis();
-        subsetsWithoutRes(original, lenSubset);
-        long stop = System.currentTimeMillis();
-
-        System.out.println("time: " + (stop - start));
+        List<Integer> original = getListByLen(lenSet);
+        calculationTime.accept(() -> subsetsWithoutRes(original, lenSubset));
     }
 
     static <T> void subsetsWithoutRes(List<T> arr, int lenSubset) {
