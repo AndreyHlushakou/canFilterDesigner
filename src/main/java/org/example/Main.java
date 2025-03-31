@@ -32,7 +32,6 @@ public class Main {
                                            0xE5,                                                 0xEE,
                                      0xF4
 
-//            0x3A, 0xDD
     };
 
     public static final List<Integer> CAN_ID_LIST = Arrays.stream(CAN_ID_ARR).boxed().sorted().toList();
@@ -78,6 +77,7 @@ public class Main {
                     if (value.getNeededSa().size() != 1) return true;
                     else return value.getExtraSa().isEmpty();
                 })
+                .filter(e -> e.getValue().getExtraSa().size() <= e.getValue().getNeededSa().size()*3)
 //                .filter(e -> e.getValue().getNeededSa().size() == 2)
 //                .sorted((e1, e2) -> )
 //                .collect(Collectors.toMap(
@@ -99,10 +99,51 @@ public class Main {
 
 
 
-//        process2(mapFilterAndPairCanIdFiltered);
+        process2(mapFilterAndPairCanIdFiltered);
     }
 
     public static void process2(Map<FilterCanPair, PairCanId> mapFilterAndPairCanIdFiltered) {
+        List<Map.Entry<FilterCanPair, PairCanId>> allFilters = new ArrayList<>(mapFilterAndPairCanIdFiltered.entrySet());
+
+        Set<Integer> uncoveredNeededSa = new HashSet<>(CAN_ID_LIST);  // Непокрытые `neededSa`
+        Set<Map.Entry<FilterCanPair, PairCanId>> result = new HashSet<>();  // Итоговый набор фильтров
+
+        double penaltyWeight = 0.5; // Штраф за `extraSa`, можно подбирать экспериментально
+
+        while (!uncoveredNeededSa.isEmpty() && result.size() < 14) {
+            Map.Entry<FilterCanPair, PairCanId> bestFilter = null;
+            double bestScore = Double.NEGATIVE_INFINITY;
+
+            for (Map.Entry<FilterCanPair, PairCanId> entry : allFilters) {
+                Set<Integer> needed = entry.getValue().getNeededSa();
+                Set<Integer> extra = entry.getValue().getExtraSa();
+
+                int newCoverage = (int) needed.stream().filter(uncoveredNeededSa::contains).count();
+                double score = newCoverage - penaltyWeight * extra.size();  // Оценка фильтра
+
+                if (score > bestScore || (score == bestScore && extra.size() < bestFilter.getValue().getExtraSa().size())) {
+                    bestScore = score;
+                    bestFilter = entry;
+                }
+            }
+
+            if (bestFilter == null) {
+                break;
+            }
+
+            result.add(bestFilter);
+            uncoveredNeededSa.removeAll(bestFilter.getValue().getNeededSa());
+            allFilters.remove(bestFilter);
+        }
+
+        // Вывод результатов
+        System.out.println("Выбранные фильтры: " + result.size());
+        for (Map.Entry<FilterCanPair, PairCanId> entry : result) {
+            System.out.println(entry.getValue());
+        }
+    }
+
+    public static void process1(Map<FilterCanPair, PairCanId> mapFilterAndPairCanIdFiltered) {
         List<Map.Entry<FilterCanPair, PairCanId>> original = mapFilterAndPairCanIdFiltered.entrySet().stream().toList();
 //        System.out.println("original.size=" + original.size());
 
