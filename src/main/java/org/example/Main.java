@@ -60,69 +60,33 @@ public class Main {
 //        soutSortedMapsBySize(0);
 
         /////////////////////////////////////////////////////////
-//        process();
+        process();
     }
 
     public static void process() {
         System.out.println("maps.size=" + mapAllFilterAndCanIds.size());
-        Map<FilterCanPair, Set<Integer>> mapFilterAndCanIdsByCAN_ID_LIST = mapAllFilterAndCanIds.entrySet().stream()
-                .filter(e -> e.getValue().stream()
-                        .anyMatch(v -> CAN_ID_LIST.stream()
-                                .anyMatch(c -> c.equals(v))))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<FilterCanPair, Set<Integer>> mapFilterAndCanIdsByCAN_ID_LIST = createMapFilterAndCanIdsByCAN_ID_LIST(CAN_ID_LIST);
 //        soutMaps(mapFilterAndCanIdsByCAN_ID_LIST);
-        System.out.println("mapFilterAndCanIdsByCAN_ID_LIST.size=" + mapFilterAndCanIdsByCAN_ID_LIST.size());
+//        System.out.println("mapFilterAndCanIdsByCAN_ID_LIST.size=" + mapFilterAndCanIdsByCAN_ID_LIST.size());
 
-        Map<FilterCanPair, PairCanId> mapFilterAndPairCanId = mapFilterAndCanIdsByCAN_ID_LIST.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> {
-                            Set<Integer> neededSa = e.getValue().stream()
-                                    .filter(v -> CAN_ID_LIST.stream()
-                                            .anyMatch(c -> c.equals(v)))
-                                    .collect(Collectors.toSet());
-                            Set<Integer> extraSa = new HashSet<>(e.getValue());
-                            extraSa.removeAll(neededSa);
-                            return new PairCanId(neededSa, extraSa);
-                        }
-                ));
+        Map<FilterCanPair, PairCanId> mapFilterAndPairCanId = createMapFilterAndPairCanId(mapFilterAndCanIdsByCAN_ID_LIST, CAN_ID_LIST);
 //        System.out.println(mapFilterAndPairCanId);
-//        System.out.println("mapFilterAndPairCanId.size=" + mapFilterAndPairCanId.size());
+        System.out.println("mapFilterAndPairCanId.size=" + mapFilterAndPairCanId.size());
 
         Map<FilterCanPair, PairCanId> mapFilterAndPairCanIdFiltered = mapFilterAndPairCanId.entrySet().stream()
-                .filter(e -> e.getValue().getExtraSa().size() < e.getValue().getNeededSa().size())
+//                .filter(e -> e.getValue().getExtraSa().size() < e.getValue().getNeededSa().size())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 //        System.out.println(mapFilterAndPairCanIdFiltered);
         System.out.println("mapFilterAndPairCanIdFiltered.size=" + mapFilterAndPairCanIdFiltered.size());
 
-        final String[] strBuff = {""};
-//        mapFilterAndPairCanId
-                mapFilterAndPairCanIdFiltered
-                .values().stream()
-                .sorted(comparatorPairCanId)
-                .forEach(e -> {
-                    String str = "N.L:" + e.getNeededSa().size() + " --- " + "E.L:" + e.getExtraSa().size();
-                    if (!strBuff[0].equals(str)) {
-                        System.out.println(str);
-                        strBuff[0] = str;
-                    }
-                });
-        System.exit(0);
 
-//        mapFilterAndPairCanIdFiltered.entrySet().stream()
-//                .sorted(Map.Entry.comparingByValue(comparatorPairCanId))
-//                .forEach(e -> {
-//                    System.out.print(e.getKey());
-//                    int sizeEx = e.getValue().getExtraSa().size();
-//                    int sizeNeed = e.getValue().getNeededSa().size();
-//                    System.out.println("N.L:" + sizeNeed + " --- " + "E.L:" + sizeEx);
-//                    System.out.println(e.getValue());
-//                    System.out.println();
-//                });
-//        System.out.println(mapFilterAndPairCanIdFiltered.size());
+//        soutMapFilterAndPairCanIdFilteredByQuantity(mapFilterAndPairCanId);
+//        soutMapFilterAndPairCanIdFilteredByQuantity(mapFilterAndPairCanIdFiltered);
+//        soutMapFilterAndPairCanIdFilteredByQuantity2(mapFilterAndPairCanIdFiltered);
 
         List<Map.Entry<FilterCanPair, PairCanId>> original = mapFilterAndPairCanIdFiltered.entrySet().stream().toList();
 //        System.out.println("original.size=" + original.size());
+        System.exit(0);
 
         AtomicInteger minCountExtra = new AtomicInteger(Integer.MAX_VALUE);
         AtomicReference<List<Map.Entry<FilterCanPair, PairCanId>>> minCountExtraSetFilters = new AtomicReference<>(null);

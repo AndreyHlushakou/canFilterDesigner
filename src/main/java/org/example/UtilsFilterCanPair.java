@@ -1,12 +1,14 @@
 package org.example;
 
 import org.example.entity.FilterCanPair;
+import org.example.entity.PairCanId;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.example.IntTernaryOperator.INT_TERNARY_OPERATOR;
+import static org.example.entity.PairCanId.comparatorPairCanId;
 
 public class UtilsFilterCanPair {
 
@@ -144,6 +146,56 @@ public class UtilsFilterCanPair {
         soutMaps(filtersForCanArrSorted);
     }
 
+    public static Map<FilterCanPair, Set<Integer>> createMapFilterAndCanIdsByCAN_ID_LIST(List<Integer> CAN_ID_LIST) {
+        return mapAllFilterAndCanIds.entrySet().stream()
+                .filter(e -> e.getValue().stream()
+                        .anyMatch(v -> CAN_ID_LIST.stream()
+                                .anyMatch(c -> c.equals(v))))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
 
+    public static Map<FilterCanPair, PairCanId> createMapFilterAndPairCanId(Map<FilterCanPair, Set<Integer>> mapFilterAndCanIdsByCAN_ID_LIST, List<Integer> CAN_ID_LIST) {
+        return mapFilterAndCanIdsByCAN_ID_LIST.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> {
+                            Set<Integer> neededSa = e.getValue().stream()
+                                    .filter(v -> CAN_ID_LIST.stream()
+                                            .anyMatch(c -> c.equals(v)))
+                                    .collect(Collectors.toSet());
+                            Set<Integer> extraSa = new HashSet<>(e.getValue());
+                            extraSa.removeAll(neededSa);
+                            return new PairCanId(neededSa, extraSa);
+                        }
+                ));
+    }
+
+    public static void soutMapFilterAndPairCanIdFilteredByQuantity(Map<FilterCanPair, PairCanId> mapFilterAndPairCanIdFiltered) {
+        final String[] strBuff = {""};
+        mapFilterAndPairCanIdFiltered
+                .values().stream()
+                .sorted(comparatorPairCanId)
+                .forEach(e -> {
+                    String str = "N.L:" + e.getNeededSa().size() + " --- " + "E.L:" + e.getExtraSa().size();
+                    if (!strBuff[0].equals(str)) {
+                        System.out.println(str);
+                        strBuff[0] = str;
+                    }
+                });
+    }
+
+    public static void soutMapFilterAndPairCanIdFilteredByQuantity2(Map<FilterCanPair, PairCanId> mapFilterAndPairCanIdFiltered){
+        mapFilterAndPairCanIdFiltered.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(comparatorPairCanId))
+                .forEach(e -> {
+                    System.out.print(e.getKey());
+                    int sizeEx = e.getValue().getExtraSa().size();
+                    int sizeNeed = e.getValue().getNeededSa().size();
+                    System.out.println("N.L:" + sizeNeed + " --- " + "E.L:" + sizeEx);
+                    System.out.println(e.getValue());
+                    System.out.println();
+                });
+        System.out.println(mapFilterAndPairCanIdFiltered.size());
+    }
 
 }
