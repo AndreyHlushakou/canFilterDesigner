@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static org.example.Utils.soutAllCanIdByFilter;
 import static org.example.UtilsFilterCanPair.*;
 
 public class Main {
@@ -33,9 +32,11 @@ public class Main {
                                            0xE5,                                                 0xEE,
                                      0xF4
 
+//            0x3A, 0xDD
     };
 
     public static final List<Integer> CAN_ID_LIST = Arrays.stream(CAN_ID_ARR).boxed().sorted().toList();
+    public static final Set<Integer> CAN_ID_SET = Arrays.stream(CAN_ID_ARR).boxed().collect(Collectors.toSet());
 
     public static void main(String[] args) {
 //
@@ -61,17 +62,32 @@ public class Main {
     }
 
     public static void process() {
-        System.out.println("maps.size=" + mapAllFilterAndCanIds.size());
+        System.out.println("totalMapFilters.size=" + totalMapFilters.size());
         Map<FilterCanPair, Set<Integer>> mapFilterAndCanIdsByCAN_ID_LIST = createMapFilterAndCanIdsByCAN_ID_LIST(CAN_ID_LIST);
 //        soutMaps(mapFilterAndCanIdsByCAN_ID_LIST);
-        System.out.println("mapFilterAndCanIdsByCAN_ID_LIST.size=" + mapFilterAndCanIdsByCAN_ID_LIST.size());
+//        System.out.println("mapFilterAndCanIdsByCAN_ID_LIST.size=" + mapFilterAndCanIdsByCAN_ID_LIST.size());
 
         Map<FilterCanPair, PairCanId> mapFilterAndPairCanId = createMapFilterAndPairCanId(mapFilterAndCanIdsByCAN_ID_LIST, CAN_ID_LIST);
 //        System.out.println(mapFilterAndPairCanId);
         System.out.println("mapFilterAndPairCanId.size=" + mapFilterAndPairCanId.size());
 
+
         Map<FilterCanPair, PairCanId> mapFilterAndPairCanIdFiltered = mapFilterAndPairCanId.entrySet().stream()
-//                .filter(e -> e.getValue().getExtraSa().size() < e.getValue().getNeededSa().size())
+                .filter(e -> {
+                    PairCanId value = e.getValue();
+                    if (value.getNeededSa().size() != 1) return true;
+                    else return value.getExtraSa().isEmpty();
+                })
+//                .filter(e -> e.getValue().getNeededSa().size() == 2)
+//                .sorted((e1, e2) -> )
+//                .collect(Collectors.toMap(
+//                        Map.Entry::getKey,
+//                        Map.Entry::getValue,
+//                        (oldValue, newValue) -> oldValue, // если есть дубликаты (в данном случае не должно быть)
+//                        LinkedHashMap::new // сохраняем порядок
+//                ));
+
+//                .filter(e -> e.getValue().getExtraSa().size() <= e.getValue().getNeededSa().size()*3)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 //        System.out.println(mapFilterAndPairCanIdFiltered);
         System.out.println("mapFilterAndPairCanIdFiltered.size=" + mapFilterAndPairCanIdFiltered.size());
@@ -80,6 +96,8 @@ public class Main {
 //        soutMapFilterAndPairCanIdFilteredByQuantity(mapFilterAndPairCanId);
 //        soutMapFilterAndPairCanIdFilteredByQuantity(mapFilterAndPairCanIdFiltered);
 //        soutMapFilterAndPairCanIdFilteredByQuantity2(mapFilterAndPairCanIdFiltered);
+
+
 
 //        process2(mapFilterAndPairCanIdFiltered);
     }
@@ -94,12 +112,11 @@ public class Main {
         AtomicReference<List<Map.Entry<FilterCanPair, PairCanId>>> minCountFiltersSetFilters = new AtomicReference<>(null);
 
         Consumer<List<Map.Entry<FilterCanPair, PairCanId>>> consumerOriginal = (subset) -> {
-            List<Integer> subsetNeeded = subset.stream()
+            Set<Integer> subsetNeeded = subset.stream()
                     .flatMap(s -> s.getValue().getNeededSa().stream())
-                    .sorted()
-                    .toList();
+                    .collect(Collectors.toSet());
 
-            boolean isContains = subsetNeeded.equals(CAN_ID_LIST);
+            boolean isContains = subsetNeeded.equals(CAN_ID_SET);
             if (isContains) {
                 Set<Integer> subsetExtra = subset.stream()
                         .flatMap(s -> s.getValue().getExtraSa().stream())
