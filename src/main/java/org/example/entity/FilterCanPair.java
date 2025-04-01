@@ -1,7 +1,6 @@
 package org.example.entity;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.Comparator;
@@ -24,7 +23,7 @@ public class FilterCanPair {
     }
 
     public String toStringReport() {
-        return "\nFilterMaskId=" + intToHex(FilterMaskId) +
+        return "FilterMaskId=" + intToHex(FilterMaskId) +
                 "\nFilterId=" + intToHex(FilterId);
     }
 

@@ -126,10 +126,11 @@ public class CalculationFilters {
                 .toString();
     }
 
-    public static String getData(Set<Map.Entry<FilterCanPair, PairCanId>> resultSet) {
+    public static String getData() {
         AtomicInteger atomicInteger = new AtomicInteger();
-        return resultSet.stream().map(e -> "numberFilter=" + atomicInteger.getAndAdd(1) + "\n" +
-                e.getKey().toStringReport())
+        return result.stream().map(e ->
+                        "№=" + atomicInteger.getAndAdd(1) + "\n" +
+                                e.getKey().toStringReport() + "\n")
                 .collect(Collectors.joining("\n"));
     }
 
