@@ -26,16 +26,20 @@ public class HandlerFiltersCanId {
     public static int parseInput(String str) {
         String bin = str;
         int radix = 10;
-        if (binaryPattern.matcher(str).find()) {
-            bin = str.replaceAll("0b", "");
-            radix = 2;
-        } else if (hexPattern.matcher(str).find()) {
-            bin = str.replaceAll("0x", "");
-            radix = 16;
+        if (!str.isEmpty()) {
+            if (binaryPattern.matcher(str).find()) {
+                bin = str.replaceAll("0b", "");
+                radix = 2;
+            } else if (hexPattern.matcher(str).find()) {
+                bin = str.replaceAll("0x", "");
+                radix = 16;
+            }
+            try {
+                return Integer.parseInt(bin, radix);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
         }
-        try {
-            return Integer.parseInt(bin, radix);
-        } catch (NumberFormatException ignored) {}
         return -1;
     }
 

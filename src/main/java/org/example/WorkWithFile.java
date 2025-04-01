@@ -29,14 +29,17 @@ public class WorkWithFile {
                 String[] arr_str = line.replaceAll(" ", "").split(",");
                 List<Integer> arr_list = Arrays.stream(arr_str).map(HandlerFiltersCanId::parseInput).filter(i -> i!=-1).toList();
                 CAN_ID_LIST.addAll(arr_list);
-                bufferedReader.close();
+//                bufferedReader.close();
             }
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
             System.out.println("ERROR: FileNotFoundException");
             return EMPTY_LIST;
         } catch (NumberFormatException e) {
+            e.printStackTrace();
             System.out.println("ERROR: incorrect number");
         } catch (IOException e) {
+            e.printStackTrace();
             System.out.println("ERROR: IOException");
             return EMPTY_LIST;
         }
@@ -48,8 +51,9 @@ public class WorkWithFile {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
             bufferedWriter.write(data);
-            bufferedWriter.close();
+//            bufferedWriter.close();
         } catch (IOException e) {
+            e.printStackTrace();
             System.out.println("ERROR: write");
             return false;
         }
