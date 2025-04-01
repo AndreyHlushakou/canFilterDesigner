@@ -102,14 +102,13 @@ public class Ui extends Application {
         return new HBox(10, browseButton, filePathField);
     }
 
-    public HBox getButtonAction(String nameButton, Predicate<File> voidConsumer) {
+    public HBox getButtonAction(String nameButton, Predicate<File> voidConsumer, File path) {
         Label labelMessage = new Label();
 
         Button calculateButton = new Button(nameButton);
         calculateButton.setOnAction(actionEvent -> {
-            if (WorkWithFile.checkPath(pathFileRead.get())) {
-                File file = pathFileRead.get();
-                boolean isSuccessfully = voidConsumer.test(file);
+            if (WorkWithFile.checkPath(path)) {
+                boolean isSuccessfully = voidConsumer.test(path);
 
                 if (isSuccessfully) {
                     labelMessage.setText("successfully");
@@ -165,7 +164,7 @@ public class Ui extends Application {
             }
             return false;
         };
-        HBox calculate = getButtonAction("Рассчитать", predicate);
+        HBox calculate = getButtonAction("Рассчитать", predicate, pathFileRead.get());
         return new VBox(10, label, calculate);
     }
 
@@ -181,7 +180,7 @@ public class Ui extends Application {
             String data = CalculationFilters.getData(setResult.get());
             return WorkWithFile.writeFile(file, data);
         };
-        HBox calculate = getButtonAction("Сохранить", voidConsumer);
+        HBox calculate = getButtonAction("Сохранить", voidConsumer, pathFileWrite.get());
         return new VBox(10, label, calculate);
     }
 
