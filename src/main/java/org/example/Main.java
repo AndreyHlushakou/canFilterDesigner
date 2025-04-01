@@ -3,6 +3,9 @@ package org.example;
 import org.example.entity.FilterCanPair;
 import org.example.entity.PairCanId;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -78,16 +81,6 @@ public class Main {
                     else return value.getExtraSa().isEmpty();
                 })
 //                .filter(e -> e.getValue().getExtraSa().size() <= e.getValue().getNeededSa().size()*3)
-//                .filter(e -> e.getValue().getNeededSa().size() == 2)
-//                .sorted((e1, e2) -> )
-//                .collect(Collectors.toMap(
-//                        Map.Entry::getKey,
-//                        Map.Entry::getValue,
-//                        (oldValue, newValue) -> oldValue, // если есть дубликаты (в данном случае не должно быть)
-//                        LinkedHashMap::new // сохраняем порядок
-//                ));
-
-//                .filter(e -> e.getValue().getExtraSa().size() <= e.getValue().getNeededSa().size()*3)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 //        System.out.println(mapFilterAndPairCanIdFiltered);
         System.out.println("mapFilterAndPairCanIdFiltered.size=" + mapFilterAndPairCanIdFiltered.size());
@@ -98,17 +91,47 @@ public class Main {
 //        soutMapFilterAndPairCanIdFilteredByQuantity2(mapFilterAndPairCanIdFiltered);
 
 
+        double penaltyWeight = 0.5; // Штраф за `extraSa`, можно подбирать экспериментально
+        boolean isInfinity = true;
+        while (isInfinity) {
+            Set<Map.Entry<FilterCanPair, PairCanId>> result = process2(mapFilterAndPairCanIdFiltered, penaltyWeight);
+            boolean isAll = CAN_ID_SET.equals(result.stream()
+                    .flatMap(e -> e.getValue().getNeededSa().stream())
+                    .collect(Collectors.toSet()));
 
-        process2(mapFilterAndPairCanIdFiltered);
+            int countNeeded = result.stream()
+                    .flatMap(e -> e.getValue().getNeededSa().stream())
+                    .collect(Collectors.toSet()).size();
+            int countExtra = result.stream()
+                    .flatMap(e -> e.getValue().getExtraSa().stream())
+                    .collect(Collectors.toSet()).size();
+
+            System.out.println(isAll);
+            System.out.println(countNeeded);
+            System.out.println(countExtra);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            try {
+                String str = br.readLine();
+                switch (str) {
+                    case "+": penaltyWeight += 0.005;
+                    break;
+                    case "-": penaltyWeight -= 0.005;
+                    break;
+                    case "0": isInfinity = false;
+                    break;
+                }
+            } catch (IOException e) {}
+            System.out.println(penaltyWeight);
+        }
+
     }
 
-    public static void process2(Map<FilterCanPair, PairCanId> mapFilterAndPairCanIdFiltered) {
+    public static Set<Map.Entry<FilterCanPair, PairCanId>> process2(Map<FilterCanPair, PairCanId> mapFilterAndPairCanIdFiltered, double penaltyWeight) {
         List<Map.Entry<FilterCanPair, PairCanId>> allFilters = new ArrayList<>(mapFilterAndPairCanIdFiltered.entrySet());
 
         Set<Integer> uncoveredNeededSa = new HashSet<>(CAN_ID_LIST);  // Непокрытые `neededSa`
         Set<Map.Entry<FilterCanPair, PairCanId>> result = new HashSet<>();  // Итоговый набор фильтров
-
-        double penaltyWeight = 0.5; // Штраф за `extraSa`, можно подбирать экспериментально
 
         while (!uncoveredNeededSa.isEmpty() && result.size() < 14) {
             Map.Entry<FilterCanPair, PairCanId> bestFilter = null;
@@ -136,11 +159,7 @@ public class Main {
             allFilters.remove(bestFilter);
         }
 
-        // Вывод результатов
-        System.out.println("Выбранные фильтры: " + result.size());
-        for (Map.Entry<FilterCanPair, PairCanId> entry : result) {
-            System.out.println(entry.getValue());
-        }
+        return result;
     }
 
     public static void process1(Map<FilterCanPair, PairCanId> mapFilterAndPairCanIdFiltered) {
