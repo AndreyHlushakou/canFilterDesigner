@@ -12,6 +12,7 @@ import org.example.entity.FilterCanPair;
 import org.example.entity.PairCanId;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 public class Ui extends Application {
+
+    public static final DecimalFormat df = new DecimalFormat("#.##");
+
     private static final AtomicReference<File> FILE_READ_ATOMIC = new AtomicReference<>(null);
     private static final AtomicReference<File> FILE_WRITE_ATOMIC = new AtomicReference<>(null);
 
@@ -162,12 +166,13 @@ public class Ui extends Application {
 
         Button btnSlider = new Button("Ввод");
         btnSlider.setOnAction(event -> {
-            PENALTY_WEIGHT_ATOMIC.set(slider.getValue());
-            labelSlider.setText("=" + slider.getValue());
+            double value = slider.getValue();
+            PENALTY_WEIGHT_ATOMIC.set(value);
+            labelSlider.setText("=" + df.format(value));
         });
-        HBox sliderPlusButton = new HBox(10, slider, labelSlider);
-        return new VBox(10, label, sliderPlusButton, btnSlider);
-
+        VBox vBoxSlider = new VBox(10, labelSlider, btnSlider);
+        HBox sliderPlusButton = new HBox(10, slider, vBoxSlider);
+        return new VBox(10, label, sliderPlusButton);
     }
 
     public VBox getCalculateBox(Label globalLabel) {
