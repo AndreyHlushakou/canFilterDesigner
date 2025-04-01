@@ -37,4 +37,15 @@ public class WorkWithFile {
 
     }
 
+    public static boolean writeFile(File file, String data) {
+        try {
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(file));
+            bufferedWriter.write(data);
+        } catch (IOException e) {
+            System.out.println("ERROR: write");
+            return false;
+        }
+        return true;
+    }
+
 }

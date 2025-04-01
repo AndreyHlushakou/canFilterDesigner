@@ -23,6 +23,11 @@ public class FilterCanPair {
                 "}\n";
     }
 
+    public String toStringReport() {
+        return "\nFilterMaskId=" + intToHex(FilterMaskId) +
+                "\nFilterId=" + intToHex(FilterId);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

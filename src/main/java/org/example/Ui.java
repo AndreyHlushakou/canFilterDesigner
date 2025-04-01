@@ -22,7 +22,7 @@ public class Ui extends Application {
     public AtomicReference<File> pathFileRead = new AtomicReference<>(null);
     public AtomicReference<File> pathFileWrite = new AtomicReference<>(null);
     public AtomicReference<Double> penaltyWeight = new AtomicReference<>(0.5);
-    public AtomicReference<Set<Map.Entry<FilterCanPair, PairCanId>>> setAtomicReference = new AtomicReference<>(null);
+    public AtomicReference<Set<Map.Entry<FilterCanPair, PairCanId>>> setResult = new AtomicReference<>(null);
 
     public static void main(String[] args) {
         launch(args);
@@ -159,7 +159,7 @@ public class Ui extends Application {
             List<Integer> CAN_ID_LIST = WorkWithFile.readFile(pathFileRead.get());
             if (!CAN_ID_LIST.isEmpty()) {
                 CalculationFilters.process(CAN_ID_LIST, penaltyWeight.get());
-                setAtomicReference.set(CalculationFilters.getResult());
+                setResult.set(CalculationFilters.getResult());
                 globalLabel.setText(CalculationFilters.getReport());
                 return true;
             }
@@ -178,8 +178,8 @@ public class Ui extends Application {
     public VBox getSaveBox() {
         Label label = new Label("5. Нажмите сохранить.");
         Predicate<File> voidConsumer = (file) -> {
-            System.out.println("bbb");
-            return true;
+            String data = CalculationFilters.getData(setResult.get());
+            return WorkWithFile.writeFile(file, data);
         };
         HBox calculate = getButtonAction("Сохранить", voidConsumer);
         return new VBox(10, label, calculate);

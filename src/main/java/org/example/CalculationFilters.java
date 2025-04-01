@@ -5,6 +5,7 @@ import org.example.entity.FilterCanPair;
 import org.example.entity.PairCanId;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -123,6 +124,13 @@ public class CalculationFilters {
                 .append("Нужные: ").append(countNeeded).append("\n")
                 .append("Лишние: ").append(countExtra).append("\n")
                 .toString();
+    }
+
+    public static String getData(Set<Map.Entry<FilterCanPair, PairCanId>> resultSet) {
+        AtomicInteger atomicInteger = new AtomicInteger();
+        return resultSet.stream().map(e -> "numberFilter=" + atomicInteger.getAndAdd(1) + "\n" +
+                e.getKey().toStringReport())
+                .collect(Collectors.joining("\n"));
     }
 
 }
