@@ -8,16 +8,21 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.example.entity.FilterCanPair;
+import org.example.entity.PairCanId;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 public class Ui extends Application {
     public AtomicReference<File> pathFileRead = new AtomicReference<>(null);
     public AtomicReference<File> pathFileWrite = new AtomicReference<>(null);
-    public AtomicReference<Double> value = new AtomicReference<>(0.5);
+    public AtomicReference<Double> penaltyWeight = new AtomicReference<>(0.5);
+    public AtomicReference<Set<Map.Entry<FilterCanPair, PairCanId>>> setAtomicReference = new AtomicReference<>(null);
 
     public static void main(String[] args) {
         launch(args);
@@ -25,9 +30,11 @@ public class Ui extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        Label globalLabel = new Label();
+
         VBox selectReadFile = getSelectReadFileBox(stage);
         VBox sliderQuality = getSliderQualityBox();
-        VBox calculate = getCalculateBox();
+        VBox calculate = getCalculateBox(globalLabel);
         VBox selectWriteFile = getSelectWriteFileBox(stage);
         VBox save = getSaveBox();
 
@@ -37,7 +44,7 @@ public class Ui extends Application {
                 calculate,
                 selectWriteFile,
                 save);
-        VBox checkBox = getCheckBox();
+        VBox checkBox = getCheckBox(globalLabel);
 
         HBox root = new HBox(10, calculateFilters, checkBox);
 
@@ -48,7 +55,7 @@ public class Ui extends Application {
         stage.show();
     }
 
-    public VBox getCheckBox() {
+    public VBox getCheckBox(Label globalLabel) {
         Label label = new Label("0. Проверка фильтра.");
 
         Label labelFilterMaskId = new Label("FilterMaskId");
@@ -59,8 +66,7 @@ public class Ui extends Application {
         TextField fieldFilterId = new TextField();
         HBox hBox2 = new HBox(10, label2, fieldFilterId);
 
-        Label labelButton = new Label();
-        ScrollPane scrollPane = new ScrollPane(labelButton);
+        ScrollPane scrollPane = new ScrollPane(globalLabel);
         scrollPane.setPrefViewportHeight(210);
         scrollPane.setPrefViewportWidth(100);
         scrollPane.setVvalue(0);
@@ -70,7 +76,7 @@ public class Ui extends Application {
             String filterMaskId = fieldFilterMaskId.getText();
             String filterId = fieldFilterId.getText();
             String text = HandlerFiltersCanId.getText(filterMaskId, filterId);
-            labelButton.setText(text);
+            globalLabel.setText(text);
         });
 
         return new VBox(10, label, hBox1, hBox2, browseButton, scrollPane);
@@ -106,8 +112,8 @@ public class Ui extends Application {
                 boolean isSuccessfully = voidConsumer.test(file);
 
                 if (isSuccessfully) {
-                    labelMessage.setText("OK");
-                } else labelMessage.setText("successfully");
+                    labelMessage.setText("successfully");
+                } else labelMessage.setText("not successfully");
 
             } else labelMessage.setText("incorrect file");
         });
@@ -124,7 +130,7 @@ public class Ui extends Application {
     public VBox getSliderQualityBox() {
         Label label = new Label("2. Выберите точность.");
 
-        Label labelSlider = new Label("=" + value.get());
+        Label labelSlider = new Label("=" + penaltyWeight.get());
 
         Slider slider = new Slider(0.0, 1, 0.5);
         slider.setOrientation(Orientation.HORIZONTAL);
@@ -139,7 +145,7 @@ public class Ui extends Application {
 
         Button btnSlider = new Button("Ввод");
         btnSlider.setOnAction(event -> {
-            value.set(slider.getValue());
+            penaltyWeight.set(slider.getValue());
             labelSlider.setText("=" + slider.getValue());
         });
         HBox sliderPlusButton = new HBox(10, slider, labelSlider);
@@ -147,16 +153,19 @@ public class Ui extends Application {
 
     }
 
-    public VBox getCalculateBox() {
+    public VBox getCalculateBox(Label globalLabel) {
         Label label = new Label("3. Нажмите рассчитать.");
-        Predicate<File> voidConsumer = (file) -> {
-            List<Integer> list = WorkWithFile.readFile(pathFileRead.get());
-            if (!list.isEmpty()) {
-                
+        Predicate<File> predicate = (file) -> {
+            List<Integer> CAN_ID_LIST = WorkWithFile.readFile(pathFileRead.get());
+            if (!CAN_ID_LIST.isEmpty()) {
+                CalculationFilters.process(CAN_ID_LIST, penaltyWeight.get());
+                setAtomicReference.set(CalculationFilters.getResult());
+                globalLabel.setText(CalculationFilters.getReport());
+                return true;
             }
             return false;
         };
-        HBox calculate = getButtonAction("Рассчитать", voidConsumer);
+        HBox calculate = getButtonAction("Рассчитать", predicate);
         return new VBox(10, label, calculate);
     }
 

@@ -16,13 +16,13 @@ public class WorkWithFile {
     }
 
     public static List<Integer> readFile(File file) {
-        ArrayList<Integer> list = new ArrayList<>();
+        List<Integer> CAN_ID_LIST = new ArrayList<>();
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file));) {
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
                 String[] arr_str = line.replaceAll(" ", "").split(",");
                 List<Integer> arr_list = Arrays.stream(arr_str).map(HandlerFiltersCanId::parseInput).filter(i -> i!=-1).toList();
-                list.addAll(arr_list);
+                CAN_ID_LIST.addAll(arr_list);
             }
         } catch (FileNotFoundException e) {
             System.out.println("ERROR: FileNotFoundException");
@@ -33,7 +33,7 @@ public class WorkWithFile {
             System.out.println("ERROR: IOException");
             return EMPTY_LIST;
         }
-        return list;
+        return CAN_ID_LIST;
 
     }
 
