@@ -27,10 +27,10 @@ public class HandlerFiltersCanId {
         String bin = str;
         int radix = 10;
         if (binaryPattern.matcher(str).find()) {
-            bin = str.substring(2);
+            bin = str.replaceAll("0b", "");
             radix = 2;
         } else if (hexPattern.matcher(str).find()) {
-            bin = str.substring(2);
+            bin = str.replaceAll("0x", "");
             radix = 16;
         }
         try {

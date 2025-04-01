@@ -10,11 +10,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 
 public class Ui extends Application {
-    public AtomicReference<File> selectedFileRead = new AtomicReference<>(null);
-    public AtomicReference<File> selectedFileWrite = new AtomicReference<>(null);
+    public AtomicReference<File> pathFileRead = new AtomicReference<>(null);
+    public AtomicReference<File> pathFileWrite = new AtomicReference<>(null);
     public AtomicReference<Double> value = new AtomicReference<>(0.5);
 
     public static void main(String[] args) {
@@ -94,9 +96,28 @@ public class Ui extends Application {
         return new HBox(10, browseButton, filePathField);
     }
 
+    public HBox getButtonAction(String nameButton, Predicate<File> voidConsumer) {
+        Label labelMessage = new Label();
+
+        Button calculateButton = new Button(nameButton);
+        calculateButton.setOnAction(actionEvent -> {
+            if (WorkWithFile.checkPath(pathFileRead.get())) {
+                File file = pathFileRead.get();
+                boolean isSuccessfully = voidConsumer.test(file);
+
+                if (isSuccessfully) {
+                    labelMessage.setText("OK");
+                } else labelMessage.setText("successfully");
+
+            } else labelMessage.setText("incorrect file");
+        });
+
+        return new HBox(10, calculateButton, labelMessage);
+    }
+
     public VBox getSelectReadFileBox(Stage primaryStage) {
-        Label label = new Label("1. Выберите файл, либо напишите к нему путь.");
-        HBox buttonPlusPath = getSelectFileBox(primaryStage, selectedFileRead);
+        Label label = new Label("1. Выберите файл.");
+        HBox buttonPlusPath = getSelectFileBox(primaryStage, pathFileRead);
         return new VBox(10, label, buttonPlusPath);
     }
 
@@ -128,46 +149,30 @@ public class Ui extends Application {
 
     public VBox getCalculateBox() {
         Label label = new Label("3. Нажмите рассчитать.");
-
-        Label labelMessage = new Label();
-
-        Button calculateButton = new Button("Рассчитать");
-        calculateButton.setOnAction(actionEvent -> {
-            if (selectedFileRead.get() != null) {
-                labelMessage.setText("123");
+        Predicate<File> voidConsumer = (file) -> {
+            List<Integer> list = WorkWithFile.readFile(pathFileRead.get());
+            if (!list.isEmpty()) {
+                
             }
-            else {
-                labelMessage.setText("456");
-            }
-        });
-        HBox calculate = new HBox(10, calculateButton, labelMessage);
-
+            return false;
+        };
+        HBox calculate = getButtonAction("Рассчитать", voidConsumer);
         return new VBox(10, label, calculate);
     }
 
     public VBox getSelectWriteFileBox(Stage primaryStage) {
         Label label = new Label("4. Выберите файл для сохранения результата.");
-        HBox buttonPlusPath = getSelectFileBox(primaryStage, selectedFileWrite);
+        HBox buttonPlusPath = getSelectFileBox(primaryStage, pathFileWrite);
         return new VBox(10, label, buttonPlusPath);
     }
 
     public VBox getSaveBox() {
         Label label = new Label("5. Нажмите сохранить.");
-
-        Label labelMessage = new Label();
-//        labelMessage.setPrefWidth(10);
-
-        Button calculateButton = new Button("Сохранить");
-        calculateButton.setOnAction(actionEvent -> {
-            if (selectedFileWrite.get() != null) {
-                labelMessage.setText("123");
-            }
-            else {
-                labelMessage.setText("456");
-            }
-        });
-        HBox calculate = new HBox(10, calculateButton, labelMessage);
-
+        Predicate<File> voidConsumer = (file) -> {
+            System.out.println("bbb");
+            return true;
+        };
+        HBox calculate = getButtonAction("Сохранить", voidConsumer);
         return new VBox(10, label, calculate);
     }
 
