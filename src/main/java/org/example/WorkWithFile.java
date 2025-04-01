@@ -12,12 +12,9 @@ public class WorkWithFile {
     private WorkWithFile() {}
 
     public static boolean checkPath(File file) {
-        boolean b1 = file != null;
-        assert file != null;
         boolean b2 = file.exists();
         boolean b3 = file.isFile();
         boolean b4 = file.canRead();
-        System.out.println(b1 + " " + b2 + " " + b3 + " " + b4);
         return b2 && b3 && b4;
     }
 

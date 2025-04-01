@@ -120,7 +120,7 @@ public class CalculationFilters {
                 .flatMap(e -> e.getValue().getExtraSa().stream())
                 .collect(Collectors.toSet()).size();
         StringBuilder builder = new StringBuilder();
-        return builder.append("Все фильтры: ").append(isAll).append("\n")
+        return builder.append("Все ли фильтры: ").append(isAll ? "ДА." : "НЕТ.").append("\n")
                 .append("Нужные: ").append(countNeeded).append("\n")
                 .append("Лишние: ").append(countExtra).append("\n")
                 .toString();

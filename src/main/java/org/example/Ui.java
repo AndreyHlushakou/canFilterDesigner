@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 
 public class Ui extends Application {
 
-    public static final DecimalFormat df = new DecimalFormat("#.##");
+    public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
 
     private static final AtomicReference<File> FILE_READ_ATOMIC = new AtomicReference<>(null);
     private static final AtomicReference<File> FILE_WRITE_ATOMIC = new AtomicReference<>(null);
@@ -39,7 +39,7 @@ public class Ui extends Application {
     public void start(Stage stage) throws Exception {
         Label globalLabel = new Label();
 
-        VBox selectReadFile = getSelectReadFileBox(stage);
+        VBox selectReadFile = getSelectReadFileBox(stage, globalLabel);
         VBox sliderQuality = getSliderQualityBox();
         VBox calculate = getCalculateBox(globalLabel);
         VBox selectWriteFile = getSelectWriteFileBox(stage);
@@ -78,12 +78,14 @@ public class Ui extends Application {
         scrollPane.setPrefViewportWidth(100);
         scrollPane.setVvalue(0);
 
-        Button browseButton = new Button("Рассчитать");
+        Button browseButton = new Button("Найти can id");
         browseButton.setOnAction(actionEvent -> {
+
             String filterMaskId = fieldFilterMaskId.getText();
             String filterId = fieldFilterId.getText();
             String text = HandlerFiltersCanId.getText(filterMaskId, filterId);
             globalLabel.setText(text);
+
         });
 
         return new VBox(10, label, hBox1, hBox2, browseButton, scrollPane);
@@ -97,14 +99,14 @@ public class Ui extends Application {
 
         // Обработчик нажатия на кнопку
         browseButton.setOnAction(actionEvent -> {
+
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Выберите файл");
-
-            // Открываем диалоговое окно для выбора файла
-            selectedFile.set(fileChooser.showOpenDialog(primaryStage));
+            selectedFile.set(fileChooser.showOpenDialog(primaryStage)); // Открываем диалоговое окно для выбора файла
             if (selectedFile.get() != null) {
                 filePathField.setText(selectedFile.get().getAbsolutePath());
             }
+
         });
         return new HBox(10, browseButton, filePathField);
     }
@@ -127,31 +129,37 @@ public class Ui extends Application {
         return new HBox(10, calculateButton, labelMessage);
     }
 
-    public VBox getSelectReadFileBox(Stage primaryStage) {
+    public VBox getSelectReadFileBox(Stage primaryStage, Label globalLabel) {
         Label label = new Label("1. Выберите файл для чтения.");
         HBox buttonPlusPath = getSelectFileBox(primaryStage, FILE_READ_ATOMIC);
 
-        Label LabelReadFile = new Label();
         Button buttonReadFile = new Button("Прочитать.");
         buttonReadFile.setOnAction(actionEvent -> {
+
             File path = FILE_READ_ATOMIC.get();
             if (path != null) {
-                List<Integer> listCanId = WorkWithFile.readFile(path);
-                if (!listCanId.isEmpty()) {
-                    CAN_ID_LIST_ATOMIC.set(listCanId);
-                    LabelReadFile.setText("Прочитано.");
-                } else LabelReadFile.setText("Ошибка1."); //файл некорректный или пустой
-            } else LabelReadFile.setText("Выберите сначала файл!");
-        });
-        HBox readButton = new HBox(10, buttonReadFile, LabelReadFile);
+                if (WorkWithFile.checkPath(path)) {
+                    List<Integer> listCanIdListFromFile = WorkWithFile.readFile(path);
+                    if (!listCanIdListFromFile.isEmpty()) {
+                        CAN_ID_LIST_ATOMIC.set(listCanIdListFromFile);
+                        globalLabel.setText("Файл прочитан.\nМассив заполнен.");
+                    } else {
+                        globalLabel.setText("Ошибка3.\nФайл некорректный или пустой.");
+                    }
+                } else {
+                    globalLabel.setText("Ошибка2.\nОшибка чтения.");
+                }
+            } else {
+                globalLabel.setText("Ошибка1.\nВыберите сначала файл!");
+            }
 
-        return new VBox(10, label, buttonPlusPath, readButton);
+        });
+
+        return new VBox(10, label, buttonPlusPath, buttonReadFile);
     }
 
     public VBox getSliderQualityBox() {
         Label label = new Label("2. Выберите точность.");
-
-        Label labelSlider = new Label("=" + PENALTY_WEIGHT_ATOMIC.get());
 
         Slider slider = new Slider(0.0, 1, 0.5);
         slider.setOrientation(Orientation.HORIZONTAL);
@@ -164,12 +172,16 @@ public class Ui extends Application {
 
         slider.setSnapToTicks(true);
 
+        Label labelSlider = new Label("=" + PENALTY_WEIGHT_ATOMIC.get());
         Button btnSlider = new Button("Ввод");
         btnSlider.setOnAction(event -> {
+
             double value = slider.getValue();
             PENALTY_WEIGHT_ATOMIC.set(value);
-            labelSlider.setText("=" + df.format(value));
+            labelSlider.setText("=" + DECIMAL_FORMAT.format(value));
+
         });
+
         VBox vBoxSlider = new VBox(10, labelSlider, btnSlider);
         HBox sliderPlusButton = new HBox(10, slider, vBoxSlider);
         return new VBox(10, label, sliderPlusButton);
@@ -177,18 +189,20 @@ public class Ui extends Application {
 
     public VBox getCalculateBox(Label globalLabel) {
         Label label = new Label("3. Нажмите рассчитать.");
-        Predicate<File> predicate = (file) -> {
+
+        Button calculateButton = new Button("Рассчитать");
+        calculateButton.setOnAction(actionEvent -> {
+
             List<Integer> canIdList = CAN_ID_LIST_ATOMIC.get();
             if (!canIdList.isEmpty()) {
                 CalculationFilters.process(canIdList, PENALTY_WEIGHT_ATOMIC.get());
                 SET_RESULT_ATOMIC.set(CalculationFilters.getResult());
-                globalLabel.setText(CalculationFilters.getReport());
-                return true;
-            } else return false;
+                globalLabel.setText("Рассчитано.\n" + CalculationFilters.getReport());
+            } else globalLabel.setText("Ошибка5.\nСначала заполните массив из файла.");
 
-        };
-        HBox calculate = getButtonAction("Рассчитать", predicate, FILE_READ_ATOMIC);
-        return new VBox(10, label, calculate);
+        });
+
+        return new VBox(10, label, calculateButton);
     }
 
     public VBox getSelectWriteFileBox(Stage primaryStage) {
