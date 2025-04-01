@@ -57,7 +57,7 @@ public class Ui extends Application {
 
         HBox root = new HBox(10, calculateFilters, checkBox);
 
-        Scene scene = new Scene(root, 500, 370);
+        Scene scene = new Scene(root, 500, 400);
         stage.setTitle("Поиск CAN фильтров");
         stage.setScene(scene);
         stage.setResizable(false);
@@ -67,17 +67,15 @@ public class Ui extends Application {
     public VBox getCheckBox(Label globalLabel) {
         Label label = new Label("0. Проверка фильтра.");
 
-        Label labelFilterMaskId = new Label("FilterMaskId");
         TextField fieldFilterMaskId = new TextField();
-        HBox hBox1 = new HBox(10, labelFilterMaskId, fieldFilterMaskId);
+        fieldFilterMaskId.setPromptText("FilterMaskId");
 
-        Label label2 = new Label("FilterId         ");
         TextField fieldFilterId = new TextField();
-        HBox hBox2 = new HBox(10, label2, fieldFilterId);
+        fieldFilterId.setPromptText("FilterId");
 
         ScrollPane scrollPane = new ScrollPane(globalLabel);
         scrollPane.setPrefViewportHeight(210);
-        scrollPane.setPrefViewportWidth(100);
+        scrollPane.setPrefViewportWidth(200);
         scrollPane.setVvalue(0);
 
         Button browseButton = new Button("Найти can id");
@@ -90,7 +88,7 @@ public class Ui extends Application {
 
         });
 
-        return new VBox(10, label, hBox1, hBox2, browseButton, scrollPane);
+        return new VBox(10, label, fieldFilterMaskId, fieldFilterId, browseButton, scrollPane);
     }
 
     public HBox getSelectFileBox(Stage primaryStage, Label globalLabel, AtomicReference<File> selectedFile) {

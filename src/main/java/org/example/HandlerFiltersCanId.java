@@ -13,7 +13,7 @@ public class HandlerFiltersCanId {
 
     private HandlerFiltersCanId() {}
 
-    public static final String INCORRECT = "incorrect";
+    public static final String INCORRECT = "Некооректный ввод.";
 
     public static String getText(String filterMaskId, String filterId) {
         int filterMaskIdInt = parseInput(filterMaskId);
