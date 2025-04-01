@@ -12,8 +12,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.example.GenerateCanIdByFilter.getText;
-
 public class Ui extends Application {
     public AtomicReference<File> selectedFileRead = new AtomicReference<>(null);
     public AtomicReference<File> selectedFileWrite = new AtomicReference<>(null);
@@ -69,7 +67,7 @@ public class Ui extends Application {
         browseButton.setOnAction(actionEvent -> {
             String filterMaskId = fieldFilterMaskId.getText();
             String filterId = fieldFilterId.getText();
-            String text = getText(filterMaskId, filterId);
+            String text = HandlerFiltersCanId.getText(filterMaskId, filterId);
             labelButton.setText(text);
         });
 

@@ -43,19 +43,25 @@ public final class Utils {
 
     //вывод всех кэнАйди для этого фильтра
     public static void soutAllCanIdByFilter(int FilterMaskId, int FilterId) {
-        System.out.println(TEXT_START);
-        System.out.println(intToHexAndBin(FilterMaskId) + " - FilterMaskId");
-        System.out.println(intToHexAndBin(FilterId) + " - FilterId");
+        System.out.println(getFilters(FilterMaskId, FilterId));
+    }
 
-        System.out.println();
-        System.out.println(TEXT_START);
+    public static String getFilters(int FilterMaskId, int FilterId) {
+        StringBuilder str = new StringBuilder()
+                .append(TEXT_START).append("\n")
+                .append(intToHexAndBin(FilterMaskId)).append(" - FilterMaskId\n")
+                .append(intToHexAndBin(FilterId)).append(" - FilterId\n")
+                .append("\n")
+                .append(TEXT_START).append("\n")
+        ;
 
         IntStream.rangeClosed(0x00, 0xFF).forEach(canId -> {
             boolean b = INT_TERNARY_OPERATOR.test(canId, FilterMaskId, FilterId);
             if (b) {
-                System.out.println(intToHexAndBin(canId));
+                str.append(intToHexAndBin(canId)).append("\n");
             }
         });
+        return str.toString();
     }
 
 }
