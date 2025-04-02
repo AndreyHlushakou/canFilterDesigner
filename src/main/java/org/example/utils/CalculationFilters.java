@@ -120,10 +120,14 @@ public class CalculationFilters {
                 .flatMap(e -> e.getValue().getExtraSa().stream())
                 .collect(Collectors.toSet()).size();
         StringBuilder builder = new StringBuilder();
-        builder.append("Все ли фильтры: ").append(isAll ? "ДА" : "НЕТ").append(".\n")
-                .append("Нужные: ").append(countNeeded).append("\n")
-                .append("Лишние: ").append(countExtra).append("\n\n");
+        builder.append("Все ли can id \nпокрывают фильтры: ").append(isAll ? "ДА" : "НЕТ").append(".\n")
+                .append("Нужные can id: ").append(countNeeded).append("\n")
+                .append("Лишние can id: ").append(countExtra).append("\n")
+                .append("Количество фильтров: ").append(result.size()).append("\n")
+                .append("\n");
+        AtomicInteger atomicInteger = new AtomicInteger(1);
         result.forEach(r -> builder
+                .append("№=").append(atomicInteger.getAndIncrement()).append("\n")
                 .append(r.getKey().toStringReport())
                 .append(r.getValue().toStringReport())
                 .append("\n")

@@ -26,10 +26,10 @@ import static org.example.utils.WorkWithFile.*;
 
 public class Ui extends Application {
 
-    public static final int MAIN_SIZE_W = 470;
+    public static final int MAIN_SIZE_W = 500;
     public static final int MAIN_SIZE_H = 420;
 
-    public static final int OUTPUT_SIZE_W = 200;
+    public static final int OUTPUT_SIZE_W = 220;
     public static final int OUTPUT_SIZE_H = 230;
 
     public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.##");
@@ -166,13 +166,14 @@ public class Ui extends Application {
 
         slider.setSnapToTicks(true);
 
-        Label labelSlider = new Label("=" + PENALTY_WEIGHT_ATOMIC.get());
+        String delimiter = "\n-------";
+        Label labelSlider = new Label("=" + DECIMAL_FORMAT.format(slider.getValue()) + delimiter);
         Button btnSlider = new Button("Ввод");
         btnSlider.setOnAction(event -> {
 
             double value = slider.getValue();
             PENALTY_WEIGHT_ATOMIC.set(value);
-            labelSlider.setText("=" + DECIMAL_FORMAT.format(value));
+            labelSlider.setText("=" + DECIMAL_FORMAT.format(value) + delimiter);
 
         });
 
