@@ -19,9 +19,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.example.CalculationFilters.*;
-import static org.example.HandlerFiltersCanId.getText;
-import static org.example.WorkWithFile.*;
+import static org.example.utils.CalculationFilters.*;
+import static org.example.utils.HandlerFiltersCanId.getText;
+import static org.example.utils.Utils.soutAllCanId;
+import static org.example.utils.WorkWithFile.*;
 
 public class Ui extends Application {
 
@@ -51,14 +52,12 @@ public class Ui extends Application {
         VBox sliderQuality = getSliderQualityBox();
         VBox calculate = getCalculateBox(globalLabel);
         VBox selectWriteFile = getSelectWriteFileBox(stage, globalLabel);
-        VBox save = getSaveBox(globalLabel);
 
         VBox calculateFilters = new VBox(10,
                 selectReadFile,
                 sliderQuality,
                 calculate,
-                selectWriteFile,
-                save);
+                selectWriteFile);
         VBox checkBox = getCheckBox(globalLabel);
 
         HBox root = new HBox(10, calculateFilters, checkBox);
@@ -134,7 +133,10 @@ public class Ui extends Application {
                     List<Integer> listCanIdListFromFile = readFile(path);
                     if (!listCanIdListFromFile.isEmpty()) {
                         CAN_ID_LIST_ATOMIC.set(listCanIdListFromFile);
-                        globalLabel.setText("Файл прочитан.\nМассив заполнен.");
+                        String builderCanId = "Файл прочитан.\n" +
+                                "Массив заполнен:\n" +
+                                soutAllCanId(CAN_ID_LIST_ATOMIC.get());
+                        globalLabel.setText(builderCanId);
                     } else {
                         globalLabel.setText("Ошибка3.\nФайл некорректный или пустой.");
                     }
@@ -227,38 +229,6 @@ public class Ui extends Application {
         });
 
         return new VBox(10, label, buttonPlusPath, calculateButton);
-    }
-
-    public VBox getSaveBox(Label globalLabel) {
-        Label label = new Label("5. Проверка содержимого.");
-
-        Button calculateButton = new Button("Вывести содержимое");
-//        calculateButton.setOnAction(actionEvent -> {
-//
-//            File path = FILE_WRITE_ATOMIC.get();
-//            if (path != null) {
-//                if (checkPath(path)) {
-//
-//                    Set<Map.Entry<FilterCanPair, PairCanId>> data = getResult();
-//                    if (data != null) {
-//                        String dataStr = getData();
-//                        boolean isSuccessfully = writeFile(FILE_WRITE_ATOMIC.get(), dataStr);
-//                        if (isSuccessfully) {
-//                            globalLabel.setText("Сохранено.\n\n" + dataStr);
-//                        } else globalLabel.setText("Ошибка7.\nФильтры не сохранены.");
-//
-//                    } else globalLabel.setText("Ошибка6.\nФильтры еще не записаны.");
-//
-//                } else {
-//                    globalLabel.setText("Ошибка2.\nОшибка доступа к файлу.");
-//                }
-//            } else {
-//                globalLabel.setText("Ошибка1.\nВыберите сначала файл!");
-//            }
-//
-//        });
-
-        return new VBox(10, label, calculateButton);
     }
 
 }

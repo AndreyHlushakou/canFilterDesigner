@@ -51,6 +51,20 @@ public class PairCanId {
                 "}\n";
     }
 
+
+    public String toStringReport() {
+        return "neededSa=" +
+                neededSa.stream()
+                        .map(v -> String.format("0x%02X", v))
+                        .sorted()
+                        .collect(Collectors.toCollection(LinkedHashSet::new)) + "\n" +
+                "extraSa=" +
+                extraSa.stream()
+                        .map(v -> String.format("0x%02X", v))
+                        .sorted()
+                        .collect(Collectors.toCollection(LinkedHashSet::new)) + "\n";
+    }
+
     public static Comparator<PairCanId> comparatorPairCanId = new ComparatorByExtra().thenComparing(new ComparatorByNeeded().reversed());
 
     static class ComparatorByExtra implements Comparator<PairCanId> {

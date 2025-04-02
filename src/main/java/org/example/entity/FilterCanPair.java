@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.Comparator;
 import java.util.Objects;
 
-import static org.example.Utils.intToHex;
+import static org.example.utils.Utils.intToHex;
 
 @AllArgsConstructor
 @Getter
@@ -23,8 +23,8 @@ public class FilterCanPair {
     }
 
     public String toStringReport() {
-        return "FilterMaskId=" + intToHex(FilterMaskId) +
-                "\nFilterId=" + intToHex(FilterId);
+        return "FilterMaskId=" + intToHex(FilterMaskId) + "\n" +
+                "FilterId=" + intToHex(FilterId)+ "\n";
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.example;
+package org.example.utils;
 
 import lombok.Getter;
 import org.example.entity.FilterCanPair;
@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.example.IntTernaryOperator.INT_TERNARY_OPERATOR;
+import static org.example.utils.IntTernaryOperator.INT_TERNARY_OPERATOR;
 
 public class CalculationFilters {
 
@@ -120,17 +120,23 @@ public class CalculationFilters {
                 .flatMap(e -> e.getValue().getExtraSa().stream())
                 .collect(Collectors.toSet()).size();
         StringBuilder builder = new StringBuilder();
-        return builder.append("Все ли фильтры: ").append(isAll ? "ДА." : "НЕТ.").append("\n")
+        builder.append("Все ли фильтры: ").append(isAll ? "ДА" : "НЕТ").append(".\n")
                 .append("Нужные: ").append(countNeeded).append("\n")
-                .append("Лишние: ").append(countExtra).append("\n")
-                .toString();
+                .append("Лишние: ").append(countExtra).append("\n\n");
+        result.forEach(r -> builder
+                .append(r.getKey().toStringReport())
+                .append(r.getValue().toStringReport())
+                .append("\n")
+        );
+
+        return builder.toString();
     }
 
     public static String getData() {
         AtomicInteger atomicInteger = new AtomicInteger();
         return result.stream().map(e ->
                         "№=" + atomicInteger.getAndAdd(1) + "\n" +
-                                e.getKey().toStringReport() + "\n")
+                                e.getKey().toStringReport())
                 .collect(Collectors.joining("\n"));
     }
 

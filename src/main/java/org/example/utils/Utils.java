@@ -1,14 +1,16 @@
-package org.example;
+package org.example.utils;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
-import static org.example.IntTernaryOperator.INT_TERNARY_OPERATOR;
+import static org.example.utils.IntTernaryOperator.INT_TERNARY_OPERATOR;
 
 public final class Utils {
 
     private Utils() {}
 
-    private static final String TEXT_START;
+    private static final String TEXT_START_HEX_BIN;
+    private static final String TEXT_START_HEX_BIN_DEC;
 
     private static final int DEFAULT_BYTE = 0x00;
 
@@ -16,13 +18,21 @@ public final class Utils {
     static {
         StringBuilder str_ = new StringBuilder("HEX  | BIN\n");
         IntStream.range(0, intToHexAndBin(DEFAULT_BYTE).length()).forEach(i -> str_.append("-"));
-        TEXT_START = str_.toString();
+        TEXT_START_HEX_BIN = str_.toString();
+
+        StringBuilder str_2 = new StringBuilder("HEX  | BIN  | DEC\n");
+        IntStream.range(0, intToHexAndBin(DEFAULT_BYTE).length()).forEach(i -> str_2.append("-"));
+        TEXT_START_HEX_BIN_DEC = str_2.toString();
     }
 
     public static String intToHexAndBin(int data) {
         String hex = intToHex(data);
         String bin = intToBin(data);
         return hex + " | " + bin;
+    }
+
+    public static String intToHexAndBinAndDec(int data) {
+        return intToHexAndBin(data) + " | " + data;
     }
 
     public static String intToHex(int data) {
@@ -42,17 +52,13 @@ public final class Utils {
     }
 
     //вывод всех кэнАйди для этого фильтра
-    public static void soutAllCanIdByFilter(int FilterMaskId, int FilterId) {
-        System.out.println(getFilters(FilterMaskId, FilterId));
-    }
-
-    public static String getFilters(int FilterMaskId, int FilterId) {
+    public static String soutAllCanIdByFilter(int FilterMaskId, int FilterId) {
         StringBuilder str = new StringBuilder()
-                .append(TEXT_START).append("\n")
+                .append(TEXT_START_HEX_BIN).append("\n")
                 .append(intToHexAndBin(FilterMaskId)).append(" - FilterMaskId\n")
                 .append(intToHexAndBin(FilterId)).append(" - FilterId\n")
                 .append("\n")
-                .append(TEXT_START).append("\n")
+                .append(TEXT_START_HEX_BIN).append("\n")
         ;
 
         IntStream.rangeClosed(0x00, 0xFF).forEach(canId -> {
@@ -61,6 +67,16 @@ public final class Utils {
                 str.append(intToHexAndBin(canId)).append("\n");
             }
         });
+        return str.toString();
+    }
+
+    //вывод всех кэнАйди для этого фильтра
+    public static String soutAllCanId(List<Integer> cnaIdList) {
+        StringBuilder str = new StringBuilder()
+                .append(TEXT_START_HEX_BIN_DEC).append("\n")
+                ;
+
+        cnaIdList.forEach(canId -> str.append(intToHexAndBinAndDec(canId)).append("\n"));
         return str.toString();
     }
 

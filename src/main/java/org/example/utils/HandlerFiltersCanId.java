@@ -1,8 +1,8 @@
-package org.example;
+package org.example.utils;
 
 import java.util.regex.Pattern;
 
-import static org.example.Utils.getFilters;
+import static org.example.utils.Utils.soutAllCanIdByFilter;
 
 public class HandlerFiltersCanId {
 
@@ -19,7 +19,7 @@ public class HandlerFiltersCanId {
         int filterMaskIdInt = parseInput(filterMaskId);
         int filterIdInt = parseInput(filterId);
         if (0x00 <= filterMaskIdInt && filterMaskIdInt <= 0xFF && 0x00 <= filterIdInt && filterIdInt <= 0xFF) {
-            return getFilters(filterMaskIdInt, filterIdInt);
+            return soutAllCanIdByFilter(filterMaskIdInt, filterIdInt);
         } else return INCORRECT;
     }
 

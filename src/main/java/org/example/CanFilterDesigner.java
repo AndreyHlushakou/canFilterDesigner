@@ -1,6 +1,4 @@
-package org.example.entity;
-
-import org.example.Ui;
+package org.example;
 
 public class CanFilterDesigner {
     public static void main(String[] args) {
