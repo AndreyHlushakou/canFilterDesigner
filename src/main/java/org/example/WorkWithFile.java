@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WorkWithFile {
 
@@ -24,7 +25,10 @@ public class WorkWithFile {
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
                 String[] arr_str = line.replaceAll(" ", "").split(",");
-                List<Integer> arr_list = Arrays.stream(arr_str).map(HandlerFiltersCanId::parseInput).filter(i -> i!=-1).toList();
+                List<Integer> arr_list = Arrays.stream(arr_str)
+                        .map(HandlerFiltersCanId::parseInput)
+                        .filter(i -> i!=-1)
+                        .toList();
                 CAN_ID_LIST.addAll(arr_list);
             }
         } catch (FileNotFoundException e) {
